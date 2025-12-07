@@ -1,0 +1,21 @@
+Idea and work path
+
+1.User login and sign up system
+
+2.User profile: Name, Dept, in-app currency(K-coin), Reputation, Stat(Q asked and solved). Except Reputation and stat others will be editable
+
+3.Home interface with a textbar similar to facebook to post question and under that there will be question based on priority then time when asked
+
+4.A filter system for dept, subject, term, higher bounty and unsolved
+
+5.Scrolling system
+
+6.A leaderborad & reputaion
+
+7.Search Function to search questions, subjects and keyword
+
+8.Violation system like user who asked must rate answer either will get penalty.
+
+9.Admin Panel (Special login under login/signup page)
+
+10.Payment gateway
