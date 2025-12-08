@@ -1,0 +1,81 @@
+package com.kna.controller;
+
+import com.kna.Main;
+import com.kna.model.User;
+import com.kna.service.AuthService;
+import com.kna.util.ToastNotification;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+/**
+ * LoginController - Handles user login
+ */
+public class LoginController {
+    
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private Button loginButton;
+    @FXML private Hyperlink registerLink;
+    @FXML private Label errorLabel;
+    
+    private final AuthService authService;
+
+    public LoginController() {
+        this.authService = new AuthService();
+    }
+
+    @FXML
+    private void initialize() {
+        // Add enter key handler
+        passwordField.setOnAction(event -> handleLogin());
+    }
+
+    @FXML
+    private void handleLogin() {
+        String email = emailField.getText();
+        String password = passwordField.getText();
+        
+        // Clear previous error
+        errorLabel.setVisible(false);
+        
+        // Validate input
+        if (email == null || email.trim().isEmpty()) {
+            showError("Please enter your email");
+            return;
+        }
+        
+        if (password == null || password.isEmpty()) {
+            showError("Please enter your password");
+            return;
+        }
+        
+        // Disable login button
+        loginButton.setDisable(true);
+        
+        try {
+            // Attempt login
+            User user = authService.login(email, password);
+            
+            // Show success message
+            ToastNotification.showSuccess("Welcome back, " + user.getName() + "!");
+            
+            // Navigate to dashboard
+            Main.switchScene("/fxml/Dashboard.fxml", "KnA - Dashboard");
+            
+        } catch (Exception e) {
+            showError(e.getMessage());
+            loginButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    private void handleRegister() {
+        // Navigate to register screen
+        Main.switchScene("/fxml/Register.fxml", "KnA - Register");
+    }
+
+    private void showError(String message) {
+        errorLabel.setText(message);
+        errorLabel.setVisible(true);
+    }
+}
