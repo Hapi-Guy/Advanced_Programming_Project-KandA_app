@@ -10,7 +10,6 @@
     <packaging>jar</packaging>
 
     <name>KnA Desktop Application</name>
-    <description>Knowledge and Answers - A JavaFX Q&A Desktop Application</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
