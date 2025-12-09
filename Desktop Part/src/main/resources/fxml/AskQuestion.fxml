@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kna.controller.AskQuestionController"
+            styleClass="root-pane">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Ask a Question" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            
+            <!-- Coin Display -->
+            <HBox styleClass="coin-badge" spacing="5" alignment="CENTER">
+                <Label text="💰" styleClass="badge-icon"/>
+                <Label fx:id="coinsLabel" styleClass="badge-text"/>
+            </HBox>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+            <VBox spacing="20" styleClass="content-container">
+                <padding>
+                    <Insets top="30" right="50" bottom="30" left="50"/>
+                </padding>
+                
+                <!-- Warning about unevaluated questions -->
+                <HBox fx:id="warningBox" styleClass="warning-box" spacing="10" alignment="CENTER_LEFT" managed="false" visible="false">
+                    <padding>
+                        <Insets top="10" right="15" bottom="10" left="15"/>
+                    </padding>
+                    <Label text="⚠️" styleClass="warning-icon"/>
+                    <VBox spacing="3">
+                        <Label fx:id="warningLabel" styleClass="warning-text" wrapText="true"/>
+                        <Label fx:id="warningSubLabel" styleClass="warning-subtext" wrapText="true"/>
+                    </VBox>
+                </HBox>
+                
+                <!-- Question Form Card -->
+                <VBox styleClass="card" spacing="20">
+                    <padding>
+                        <Insets top="25" right="30" bottom="25" left="30"/>
+                    </padding>
+                    
+                    <!-- Title Field -->
+                    <VBox spacing="8">
+                        <Label text="Question Title" styleClass="form-label-bold">
+                            <graphic>
+                                <Label text="*" styleClass="required-asterisk"/>
+                            </graphic>
+                        </Label>
+                        <TextField fx:id="titleField" promptText="Enter a clear, concise title for your question"
+                                  styleClass="input-field"/>
+                        <Label text="Be specific and imagine you're asking another person" styleClass="help-text"/>
+                    </VBox>
+                    
+                    <!-- Description Field -->
+                    <VBox spacing="8">
+                        <Label text="Question Description" styleClass="form-label-bold">
+                            <graphic>
+                                <Label text="*" styleClass="required-asterisk"/>
+                            </graphic>
+                        </Label>
+                        <TextArea fx:id="descriptionArea" promptText="Provide detailed description of your question"
+                                 wrapText="true" prefRowCount="8" styleClass="input-field"/>
+                        <Label text="Include all the information someone would need to answer your question" styleClass="help-text"/>
+                    </VBox>
+                    
+                    <!-- Category Selection -->
+                    <VBox spacing="8">
+                        <Label text="Subject/Category" styleClass="form-label-bold">
+                            <graphic>
+                                <Label text="*" styleClass="required-asterisk"/>
+                            </graphic>
+                        </Label>
+                        <ComboBox fx:id="categoryCombo" promptText="Select the relevant subject area"
+                                 prefWidth="300" styleClass="input-field"/>
+                    </VBox>
+                    
+                    <!-- Image Upload -->
+                    <VBox spacing="8">
+                        <Label text="Attach Image (Optional)" styleClass="form-label-bold"/>
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <Button text="Choose Image" styleClass="secondary-button" onAction="#chooseImage"/>
+                            <Label fx:id="imageFileLabel" text="No image selected" styleClass="help-text"/>
+                        </HBox>
+                        <StackPane fx:id="imagePreviewPane" managed="false" visible="false" maxHeight="200">
+                            <ImageView fx:id="imagePreview" preserveRatio="true" fitHeight="200"/>
+                        </StackPane>
+                    </VBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Urgent Mode Toggle -->
+                    <VBox spacing="15">
+                        <HBox spacing="15" alignment="CENTER_LEFT">
+                            <CheckBox fx:id="urgentCheckbox" styleClass="urgent-checkbox" onAction="#updateCostDisplay"/>
+                            <VBox spacing="3">
+                                <Label text="Mark as Urgent" styleClass="form-label-bold"/>
+                                <Label text="Urgent questions appear at the top and attract faster responses (costs extra 10 coins)" 
+                                       styleClass="help-text" wrapText="true"/>
+                            </VBox>
+                        </HBox>
+                        
+                        <!-- Cost Display -->
+                        <HBox styleClass="cost-display" spacing="10" alignment="CENTER_LEFT">
+                            <padding>
+                                <Insets top="12" right="15" bottom="12" left="15"/>
+                            </padding>
+                            <Label text="💰" styleClass="cost-icon"/>
+                            <Label text="Cost:" styleClass="cost-label"/>
+                            <Label fx:id="costLabel" text="20" styleClass="cost-value"/>
+                            <Label text="coins" styleClass="cost-label"/>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Submit Button -->
+                    <HBox spacing="15" alignment="CENTER_RIGHT">
+                        <padding>
+                            <Insets top="10"/>
+                        </padding>
+                        <Button text="Cancel" styleClass="secondary-button" onAction="#goBack"/>
+                        <Button text="Post Question" styleClass="primary-button" onAction="#submitQuestion"/>
+                    </HBox>
+                </VBox>
+                
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+</BorderPane>

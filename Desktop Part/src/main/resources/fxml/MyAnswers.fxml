@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kna.controller.MyAnswersController"
+            styleClass="root-pane">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="My Answers" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="0" styleClass="content-container">
+            
+            <!-- Stats Bar -->
+            <HBox styleClass="stats-bar" spacing="30" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="20" right="30" bottom="20" left="30"/>
+                </padding>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Total Answers" styleClass="stat-label"/>
+                    <Label fx:id="totalAnswersLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Accepted" styleClass="stat-label"/>
+                    <Label fx:id="acceptedLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Acceptance Rate" styleClass="stat-label"/>
+                    <Label fx:id="acceptanceRateLabel" text="0%" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Coins Earned" styleClass="stat-label"/>
+                    <HBox spacing="5" alignment="CENTER">
+                        <Label text="💰" styleClass="coin-icon-small"/>
+                        <Label fx:id="coinsEarnedLabel" text="0" styleClass="stat-value-large"/>
+                    </HBox>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Total Votes" styleClass="stat-label"/>
+                    <Label fx:id="totalVotesLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+            </HBox>
+            
+            <!-- Filter Bar -->
+            <HBox styleClass="filter-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Label text="Filter:" styleClass="filter-label"/>
+                <Button fx:id="allBtn" text="All" styleClass="filter-tab,active-tab" onAction="#showAllAnswers"/>
+                <Button fx:id="acceptedBtn" text="Accepted" styleClass="filter-tab" onAction="#showAcceptedAnswers"/>
+                <Button fx:id="topRatedBtn" text="Top Rated" styleClass="filter-tab" onAction="#showTopRatedAnswers"/>
+            </HBox>
+            
+            <!-- Answers List -->
+            <ScrollPane fx:id="answersScrollPane" fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                <VBox fx:id="answersList" spacing="10" styleClass="answers-list">
+                    <padding>
+                        <Insets top="10" right="20" bottom="20" left="20"/>
+                    </padding>
+                </VBox>
+            </ScrollPane>
+            
+            <!-- Empty State -->
+            <StackPane fx:id="emptyStatePane" managed="false" visible="false">
+                <padding>
+                    <Insets top="50"/>
+                </padding>
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="💭" style="-fx-font-size: 48px;"/>
+                    <Label text="No answers yet" styleClass="empty-state-text"/>
+                    <Label text="Start helping others by answering questions!" 
+                           styleClass="empty-state-subtext"/>
+                    <Button text="Browse Questions" styleClass="primary-button" onAction="#browseQuestions"/>
+                </VBox>
+            </StackPane>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>
