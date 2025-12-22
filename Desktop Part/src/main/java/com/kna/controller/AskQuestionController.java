@@ -1,22 +1,26 @@
 package com.kna.controller;
 
+import java.io.File;
+
 import com.kna.Main;
 import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.service.QuestionService;
-import com.kna.util.ImageLoader;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
-
-import java.io.File;
 
 /**
  * Controller for the Ask Question page.
@@ -193,24 +197,16 @@ public class AskQuestionController {
                 return;
             }
             
-            // Create question object
-            Question question = new Question();
-            question.setUserId(currentUser.getId());
-            question.setTitle(title);
-            question.setDescription(description);
-            question.setCategory(category);
-            question.setUrgent(isUrgent);
+            // Post question using QuestionService (it handles image saving internally)
+            Question question = questionService.askQuestion(
+                title,
+                description,
+                category,
+                isUrgent,
+                selectedImageFile
+            );
             
-            // Save image if selected
-            String imagePath = null;
-            if (selectedImageFile != null) {
-                imagePath = ImageLoader.saveQuestionImage(selectedImageFile);
-            }
-            
-            // Post question
-            int questionId = questionService.askQuestion(question, imagePath);
-            
-            if (questionId > 0) {
+            if (question != null && question.getQuestionId() > 0) {
                 // Update current user's coin balance
                 currentUser = SessionManager.getInstance().getCurrentUser(); // Refresh from session
                 
@@ -257,13 +253,13 @@ public class AskQuestionController {
      * Show success toast notification.
      */
     private void showSuccess(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.SUCCESS);
+        ToastNotification.show(message, ToastNotification.NotificationType.SUCCESS);
     }
     
     /**
      * Show error toast notification.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
 }

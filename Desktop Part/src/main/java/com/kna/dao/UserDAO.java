@@ -1,11 +1,14 @@
 package com.kna.dao;
 
-import com.kna.model.User;
-import com.kna.util.DatabaseManager;
-
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.kna.model.User;
+import com.kna.util.DatabaseManager;
 
 /**
  * UserDAO - Data Access Object for User entity
@@ -73,21 +76,27 @@ public class UserDAO {
     }
 
     /**
-     * Update user profile
+     * Update user profile (PLAIN TEXT PASSWORD)
      */
-    public boolean updateUser(User user) throws SQLException {
-        String sql = "UPDATE users SET name = ?, phone = ?, department = ?, academic_year = ?, " +
-                     "updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+    public void updateUser(User user) throws SQLException {
+        String sql = "UPDATE users SET name = ?, email = ?, department = ?, academic_year = ?, " +
+                     "password_hash = ?, coins = ?, reputation = ?, total_questions = ?, " +
+                     "total_answers = ?, accepted_answers = ?, updated_at = CURRENT_TIMESTAMP " +
+                     "WHERE user_id = ?";
         
-        int rowsAffected = dbManager.executeUpdate(sql,
-            user.getName(),
-            user.getPhone(),
-            user.getDepartment(),
-            user.getAcademicYear(),
-            user.getUserId()
+        dbManager.executeUpdate(sql,
+            user.getName(),              // 1
+            user.getEmail(),             // 2
+            user.getDepartment(),        // 3
+            user.getAcademicYear(),      // 4
+            user.getPasswordHash(),      // 5 - PLAIN TEXT password
+            user.getCoins(),             // 6
+            user.getReputation(),        // 7
+            user.getQuestionsAsked(),    // 8
+            user.getAnswersGiven(),      // 9
+            user.getAcceptedAnswers(),   // 10
+            user.getUserId()             // 11 - WHERE clause
         );
-        
-        return rowsAffected > 0;
     }
 
     /**
@@ -98,27 +107,6 @@ public class UserDAO {
         
         int rowsAffected = dbManager.executeUpdate(sql, newBalance, userId);
         return rowsAffected > 0;
-    }
-
-    /**
-     * Update user information
-     */
-    public boolean updateUser(User user) {
-        String sql = "UPDATE users SET name = ?, phone = ?, department = ?, academic_year = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
-        
-        try {
-            int rowsAffected = dbManager.executeUpdate(sql, 
-                user.getName(), 
-                user.getPhone(), 
-                user.getDepartment(), 
-                user.getAcademicYear(), 
-                user.getId()
-            );
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
     }
     
     /**

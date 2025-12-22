@@ -1,5 +1,9 @@
 package com.kna.controller;
 
+import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import com.kna.Main;
 import com.kna.dao.AnswerDAO;
 import com.kna.dao.QuestionDAO;
@@ -8,15 +12,17 @@ import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-
-import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller for My Answers page.
@@ -196,7 +202,7 @@ public class MyAnswersController {
         if (answer.isAccepted()) {
             Label coinsLabel = new Label("💰 " + answer.getCoinsAwarded() + " coins earned");
             coinsLabel.getStyleClass().add("answer-meta");
-            if (answer.getRating() != null) {
+            if (answer.getRating() > 0) {
                 Label ratingLabel = new Label("⭐ " + answer.getRating() + "/5");
                 ratingLabel.getStyleClass().add("answer-meta");
                 earnings.getChildren().addAll(coinsLabel, new Label("|"), ratingLabel);
@@ -355,6 +361,6 @@ public class MyAnswersController {
      * Show error toast notification.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
 }

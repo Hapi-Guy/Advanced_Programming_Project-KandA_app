@@ -1,20 +1,26 @@
 package com.kna.controller;
 
+import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import com.kna.Main;
 import com.kna.dao.QuestionDAO;
 import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-
-import java.sql.SQLException;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * Controller for My Questions page.
@@ -342,6 +348,6 @@ public class MyQuestionsController {
      * Show error toast notification.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
 }
