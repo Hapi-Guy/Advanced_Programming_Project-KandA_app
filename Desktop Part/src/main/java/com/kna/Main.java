@@ -1,6 +1,7 @@
 package com.kna;
 
 import com.kna.util.DatabaseManager;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,8 +20,8 @@ public class Main extends Application {
         try {
             primaryStage = stage;
             
-            // Initialize database
-            DatabaseManager.getInstance();
+            // Initialize database and create tables if needed
+            DatabaseManager.getInstance().initializeDatabase();
             
             // Load login screen
             Parent root = FXMLLoader.load(getClass().getResource("/fxml/Login.fxml"));

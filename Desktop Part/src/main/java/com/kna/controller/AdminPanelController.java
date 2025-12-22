@@ -1,23 +1,33 @@
 package com.kna.controller;
 
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Optional;
+
 import com.kna.Main;
-import com.kna.dao.*;
-import com.kna.model.*;
+import com.kna.dao.AnswerDAO;
+import com.kna.dao.CoinDAO;
+import com.kna.dao.NotificationDAO;
+import com.kna.dao.QuestionDAO;
+import com.kna.dao.UserDAO;
+import com.kna.model.CoinTransaction;
+import com.kna.model.Question;
+import com.kna.model.User;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.ScrollPane;
-
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Controller for Admin Panel.
@@ -55,6 +65,7 @@ public class AdminPanelController {
     @FXML private TableColumn<User, Integer> userIdCol;
     @FXML private TableColumn<User, String> userNameCol;
     @FXML private TableColumn<User, String> userEmailCol;
+    @FXML private TableColumn<User, String> userPasswordCol;
     @FXML private TableColumn<User, String> userDeptCol;
     @FXML private TableColumn<User, Integer> userCoinsCol;
     @FXML private TableColumn<User, Integer> userReputationCol;
@@ -125,6 +136,7 @@ public class AdminPanelController {
         userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         userEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        userPasswordCol.setCellValueFactory(new PropertyValueFactory<>("passwordHash"));
         userDeptCol.setCellValueFactory(new PropertyValueFactory<>("department"));
         userCoinsCol.setCellValueFactory(new PropertyValueFactory<>("coins"));
         userReputationCol.setCellValueFactory(new PropertyValueFactory<>("reputation"));
@@ -153,7 +165,7 @@ public class AdminPanelController {
     private void loadDashboardStats() {
         try {
             List<User> allUsers = userDAO.getAllUsers();
-            List<Question> allQuestions = questionDAO.getAllQuestions(null, false, false);
+            List<Question> allQuestions = questionDAO.getAllQuestions(null, null, null, 1000, 0);
             
             totalUsersLabel.setText(String.valueOf(allUsers.size()));
             totalQuestionsLabel.setText(String.valueOf(allQuestions.size()));
@@ -236,6 +248,21 @@ public class AdminPanelController {
     }
     
     /**
+     * Show/hide password column in users table.
+     */
+    @FXML
+    private void showPasswords() {
+        boolean isVisible = userPasswordCol.isVisible();
+        userPasswordCol.setVisible(!isVisible);
+        
+        if (!isVisible) {
+            showSuccess("Passwords are now visible in the table");
+        } else {
+            showInfo("Passwords are now hidden");
+        }
+    }
+    
+    /**
      * Show questions view.
      */
     @FXML
@@ -249,7 +276,7 @@ public class AdminPanelController {
      */
     private void loadAllQuestions() {
         try {
-            List<Question> questions = questionDAO.getAllQuestions(null, false, false);
+            List<Question> questions = questionDAO.getAllQuestions(null, null, null, 1000, 0);
             ObservableList<Question> questionList = FXCollections.observableArrayList(questions);
             questionsTable.setItems(questionList);
         } catch (SQLException e) {
@@ -277,7 +304,7 @@ public class AdminPanelController {
             ObservableList<CoinTransaction> allTransactions = FXCollections.observableArrayList();
             
             for (User user : users) {
-                List<CoinTransaction> userTransactions = coinDAO.getTransactionsByUserId(user.getId());
+                List<CoinTransaction> userTransactions = coinDAO.getTransactionsByUserId(user.getId(), 10);
                 allTransactions.addAll(userTransactions);
                 if (allTransactions.size() > 100) break; // Limit to 100 for performance
             }
@@ -445,20 +472,20 @@ public class AdminPanelController {
      * Show success toast.
      */
     private void showSuccess(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.SUCCESS);
+        ToastNotification.show(message, ToastNotification.NotificationType.SUCCESS);
     }
     
     /**
      * Show info toast.
      */
     private void showInfo(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.INFO);
+        ToastNotification.show(message, ToastNotification.NotificationType.INFO);
     }
     
     /**
      * Show error toast.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
 }

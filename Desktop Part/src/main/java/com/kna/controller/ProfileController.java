@@ -6,9 +6,13 @@ import com.kna.model.User;
 import com.kna.service.AuthService;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 /**
  * Controller for the user profile page.
@@ -79,8 +83,13 @@ public class ProfileController {
      */
     private void loadUserProfile() {
         // Refresh user data from database
-        currentUser = userDAO.findById(currentUser.getId());
-        if (currentUser == null) {
+        try {
+            currentUser = userDAO.findById(currentUser.getId());
+            if (currentUser == null) {
+                showError("Failed to load user data.");
+                return;
+            }
+        } catch (Exception e) {
             showError("Failed to load user data.");
             return;
         }
@@ -107,9 +116,12 @@ public class ProfileController {
         // Populate editable fields
         nameField.setText(currentUser.getName());
         emailField.setText(currentUser.getEmail());
-        phoneField.setText(currentUser.getPhone());
+        // phoneField.setText(""); // Phone field not in User model
         departmentCombo.setValue(currentUser.getDepartment());
-        yearCombo.setValue(currentUser.getAcademicYear());
+        // Convert int year to String format for ComboBox
+        int yearValue = currentUser.getAcademicYear();
+        String yearString = yearValue + (yearValue == 1 ? "st" : yearValue == 2 ? "nd" : yearValue == 3 ? "rd" : "th") + " Year";
+        yearCombo.setValue(yearString);
     }
     
     /**
@@ -134,7 +146,7 @@ public class ProfileController {
     @FXML
     private void saveProfile() {
         String name = nameField.getText().trim();
-        String phone = phoneField.getText().trim();
+        // String phone = phoneField.getText().trim(); // Phone field not in User model
         String department = departmentCombo.getValue();
         String year = yearCombo.getValue();
         
@@ -156,18 +168,19 @@ public class ProfileController {
         
         // Update user object
         currentUser.setName(name);
-        currentUser.setPhone(phone);
+        // currentUser.setPhone(phone); // Phone field not in User model
         currentUser.setDepartment(department);
-        currentUser.setAcademicYear(year);
+        // Extract year number from string like "1st Year", "2nd Year", etc.
+        int yearValue = year.equals("Graduate") ? 5 : Integer.parseInt(year.substring(0, 1));
+        currentUser.setAcademicYear(yearValue);
         
         // Save to database
-        boolean success = userDAO.updateUser(currentUser);
-        
-        if (success) {
+        try {
+            userDAO.updateUser(currentUser);
             SessionManager.getInstance().setCurrentUser(currentUser);
             showSuccess("Profile updated successfully!");
             loadUserProfile(); // Refresh display
-        } else {
+        } catch (Exception e) {
             showError("Failed to update profile. Please try again.");
         }
     }
@@ -212,17 +225,21 @@ public class ProfileController {
         }
         
         // Attempt password change
-        boolean success = authService.changePassword(currentUser.getId(), currentPassword, newPassword);
-        
-        if (success) {
-            showSuccess("Password changed successfully!");
+        try {
+            boolean success = authService.changePassword(currentUser.getId(), currentPassword, newPassword);
             
-            // Clear password fields
-            currentPasswordField.clear();
-            newPasswordField.clear();
-            confirmPasswordField.clear();
-        } else {
-            showError("Current password is incorrect.");
+            if (success) {
+                showSuccess("Password changed successfully!");
+                
+                // Clear password fields
+                currentPasswordField.clear();
+                newPasswordField.clear();
+                confirmPasswordField.clear();
+            } else {
+                showError("Current password is incorrect.");
+            }
+        } catch (Exception e) {
+            showError("Failed to change password: " + e.getMessage());
         }
     }
     
@@ -255,20 +272,20 @@ public class ProfileController {
      * Show success toast notification.
      */
     private void showSuccess(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.SUCCESS);
+        ToastNotification.show(message, ToastNotification.NotificationType.SUCCESS);
     }
     
     /**
      * Show error toast notification.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
     
     /**
      * Show info toast notification.
      */
     private void showInfo(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.INFO);
+        ToastNotification.show(message, ToastNotification.NotificationType.INFO);
     }
 }
