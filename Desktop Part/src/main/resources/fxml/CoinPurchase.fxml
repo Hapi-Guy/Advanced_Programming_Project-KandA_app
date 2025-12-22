@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.kna.controller.CoinPurchaseController">
+    
+    <!-- Scrollable Content -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="edge-to-edge">
+            <VBox spacing="20">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+                
+                <!-- Header -->
+                <VBox spacing="10" styleClass="card">
+                    <Label text="Purchase Coins" styleClass="label-title"/>
+                    <Label text="Select a coin package below" styleClass="label-secondary"/>
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="10">
+                        <Label text="Current Balance:" style="-fx-font-weight: bold;"/>
+                        <Label fx:id="currentBalanceLabel" styleClass="coin-display"/>
+                    </HBox>
+                </VBox>
+                
+                <!-- Coin Packages -->
+                <GridPane fx:id="packagesGrid" hgap="20" vgap="20">
+                    <!-- Packages will be loaded dynamically -->
+                </GridPane>
+                
+                <!-- Selected Package Info -->
+                <VBox fx:id="selectedPackageInfo" spacing="15" styleClass="card" visible="false">
+                    <Label text="Selected Package" styleClass="label-header"/>
+                    <Separator/>
+                    
+                    <HBox spacing="10">
+                        <Label text="Package:"/>
+                        <Label fx:id="selectedPackageNameLabel" style="-fx-font-weight: bold;"/>
+                    </HBox>
+                    
+                    <HBox spacing="10">
+                        <Label text="Coins:"/>
+                        <Label fx:id="selectedCoinsLabel" styleClass="coin-display"/>
+                    </HBox>
+                    
+                    <HBox spacing="10">
+                        <Label text="Price:"/>
+                        <Label fx:id="selectedPriceLabel" style="-fx-font-weight: bold; -fx-font-size: 16px;"/>
+                    </HBox>
+                    
+                    <Separator/>
+                    
+                    <HBox spacing="15">
+                        <Button text="Confirm Purchase" onAction="#handlePurchase" 
+                               styleClass="button-success" prefWidth="200"/>
+                        <Button text="Cancel" onAction="#handleCancel" 
+                               styleClass="button-secondary"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>

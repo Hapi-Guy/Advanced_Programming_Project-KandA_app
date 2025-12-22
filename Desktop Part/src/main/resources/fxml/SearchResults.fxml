@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kna.controller.SearchResultsController"
+            styleClass="root-pane">
+    
+    <!-- Top Bar -->
+    <top>
+        <VBox spacing="0">
+            <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Search Results" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+            
+            <!-- Search Bar -->
+            <HBox styleClass="search-bar-container" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <TextField fx:id="searchField" promptText="Search questions, users, or topics..." 
+                          HBox.hgrow="ALWAYS" styleClass="search-input"/>
+                <Button text="Search" styleClass="primary-button" onAction="#performSearch"/>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="0" styleClass="content-container">
+            
+            <!-- Filter Tabs -->
+            <HBox styleClass="filter-tabs" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Label text="Show:" styleClass="filter-label"/>
+                <Button fx:id="allTabBtn" text="All" styleClass="filter-tab,active-tab" onAction="#showAll"/>
+                <Button fx:id="questionsTabBtn" text="Questions" styleClass="filter-tab" onAction="#showQuestions"/>
+                <Button fx:id="usersTabBtn" text="Users" styleClass="filter-tab" onAction="#showUsers"/>
+            </HBox>
+            
+            <!-- Results Count -->
+            <HBox styleClass="results-header" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="10" right="20" bottom="10" left="20"/>
+                </padding>
+                <Label fx:id="resultsCountLabel" text="Found 0 results" styleClass="results-count"/>
+            </HBox>
+            
+            <!-- Results List -->
+            <ScrollPane fx:id="resultsScrollPane" fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                <VBox fx:id="resultsList" spacing="10" styleClass="results-list">
+                    <padding>
+                        <Insets top="10" right="20" bottom="20" left="20"/>
+                    </padding>
+                </VBox>
+            </ScrollPane>
+            
+            <!-- Empty State -->
+            <StackPane fx:id="emptyStatePane" managed="false" visible="false">
+                <padding>
+                    <Insets top="50"/>
+                </padding>
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="🔍" style="-fx-font-size: 48px;"/>
+                    <Label fx:id="emptyStateTitle" text="No results found" styleClass="empty-state-text"/>
+                    <Label fx:id="emptyStateSubtitle" text="Try different keywords or check your spelling" 
+                           styleClass="empty-state-subtext" wrapText="true" textAlignment="CENTER" maxWidth="400"/>
+                </VBox>
+            </StackPane>
+            
+            <!-- Initial State -->
+            <StackPane fx:id="initialStatePane" managed="true" visible="true">
+                <padding>
+                    <Insets top="50"/>
+                </padding>
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="🔎" style="-fx-font-size: 48px;"/>
+                    <Label text="Start searching" styleClass="empty-state-text"/>
+                    <Label text="Enter keywords to search questions, users, or topics" 
+                           styleClass="empty-state-subtext" wrapText="true" textAlignment="CENTER" maxWidth="400"/>
+                </VBox>
+            </StackPane>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>
