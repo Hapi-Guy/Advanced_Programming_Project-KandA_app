@@ -1,26 +1,28 @@
 package com.kna.controller;
 
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 import com.kna.Main;
 import com.kna.dao.NotificationDAO;
 import com.kna.model.Notification;
 import com.kna.model.User;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
-import javafx.application.Platform;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 /**
  * Controller for the Notifications page.
@@ -146,7 +148,11 @@ public class NotificationsController {
         message.setWrapText(true);
         message.getStyleClass().add("notification-message");
         
-        Label time = new Label(formatTimeAgo(notification.getCreatedAt()));
+        // Convert Timestamp to LocalDateTime
+        LocalDateTime dateTime = notification.getCreatedAt() != null 
+            ? notification.getCreatedAt().toLocalDateTime() 
+            : LocalDateTime.now();
+        Label time = new Label(formatTimeAgo(dateTime));
         time.getStyleClass().add("notification-time");
         
         messageArea.getChildren().addAll(message, time);
@@ -378,13 +384,13 @@ public class NotificationsController {
      * Show success toast notification.
      */
     private void showSuccess(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.SUCCESS);
+        ToastNotification.show(message, ToastNotification.NotificationType.SUCCESS);
     }
     
     /**
      * Show error toast notification.
      */
     private void showError(String message) {
-        ToastNotification.show(backButton.getScene().getWindow(), message, ToastNotification.Type.ERROR);
+        ToastNotification.show(message, ToastNotification.NotificationType.ERROR);
     }
 }
