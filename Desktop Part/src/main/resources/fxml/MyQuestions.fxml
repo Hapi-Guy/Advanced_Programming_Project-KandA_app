@@ -15,8 +15,6 @@
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             
-            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
-            <Region HBox.hgrow="ALWAYS"/>
             <Label text="My Questions" styleClass="page-title"/>
             <Region HBox.hgrow="ALWAYS"/>
         </HBox>
@@ -69,10 +67,7 @@
                 </padding>
                 
                 <Label text="Filter:" styleClass="filter-label"/>
-                <Button fx:id="allBtn" text="All" styleClass="filter-tab,active-tab" onAction="#showAllQuestions"/>
-                <Button fx:id="answeredBtn" text="Answered" styleClass="filter-tab" onAction="#showAnsweredQuestions"/>
-                <Button fx:id="unansweredBtn" text="Unanswered" styleClass="filter-tab" onAction="#showUnansweredQuestions"/>
-                <Button fx:id="urgentBtn" text="Urgent" styleClass="filter-tab" onAction="#showUrgentQuestions"/>
+                <ComboBox fx:id="filterComboBox" onAction="#applyFilter" prefWidth="150"/>
             </HBox>
             
             <!-- Questions List -->

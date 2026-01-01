@@ -12,9 +12,12 @@ import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
@@ -36,11 +39,8 @@ public class MyQuestionsController {
     @FXML private Label unevaluatedLabel;
     @FXML private Label coinsSpentLabel;
     
-    // Filter Buttons
-    @FXML private Button allBtn;
-    @FXML private Button answeredBtn;
-    @FXML private Button unansweredBtn;
-    @FXML private Button urgentBtn;
+    // Filter ComboBox
+    @FXML private ComboBox<String> filterComboBox;
     
     // Content Areas
     @FXML private ScrollPane questionsScrollPane;
@@ -59,6 +59,10 @@ public class MyQuestionsController {
     public void initialize() {
         questionDAO = new QuestionDAO();
         currentUser = SessionManager.getInstance().getCurrentUser();
+        
+        // Initialize filter dropdown
+        filterComboBox.getItems().addAll("All", "Answered", "Unanswered", "Urgent");
+        filterComboBox.setValue("All");
         
         if (currentUser != null) {
             loadQuestions();
@@ -226,8 +230,24 @@ public class MyQuestionsController {
      */
     private void viewQuestion(Question question) {
         try {
-            SessionManager.getInstance().setAttribute("viewQuestionId", question.getId());
-            Main.switchScene("QuestionDetail.fxml", "KnA - Question Details");
+            // Try to find the Dashboard's content area (when loaded inside Dashboard)
+            StackPane dashboardContentArea = findDashboardContentArea();
+            
+            if (dashboardContentArea != null) {
+                // Load into Dashboard's content area
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/QuestionDetail.fxml"));
+                Parent questionView = loader.load();
+                
+                QuestionDetailController controller = loader.getController();
+                controller.loadQuestion(question.getId());
+                
+                dashboardContentArea.getChildren().clear();
+                dashboardContentArea.getChildren().add(questionView);
+            } else {
+                // Fallback to switching scene
+                SessionManager.getInstance().setAttribute("viewQuestionId", question.getId());
+                Main.switchScene("/fxml/QuestionDetail.fxml", "KnA - Question Details");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to open question.");
@@ -235,55 +255,39 @@ public class MyQuestionsController {
     }
     
     /**
-     * Filter: Show all questions.
+     * Find the Dashboard's content area by traversing up the scene graph.
      */
-    @FXML
-    private void showAllQuestions() {
-        currentFilter = "all";
-        updateActiveTab(allBtn);
-        displayQuestions(allQuestions);
+    private StackPane findDashboardContentArea() {
+        try {
+            javafx.scene.Node node = questionsList;
+            while (node != null) {
+                if (node instanceof StackPane && node.getId() != null && node.getId().equals("contentArea")) {
+                    return (StackPane) node;
+                }
+                node = node.getParent();
+            }
+        } catch (Exception e) {
+            // Ignore and return null
+        }
+        return null;
     }
     
     /**
-     * Filter: Show answered questions.
+     * Apply filter based on ComboBox selection.
      */
     @FXML
-    private void showAnsweredQuestions() {
-        currentFilter = "answered";
-        updateActiveTab(answeredBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Filter: Show unanswered questions.
-     */
-    @FXML
-    private void showUnansweredQuestions() {
-        currentFilter = "unanswered";
-        updateActiveTab(unansweredBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Filter: Show urgent questions.
-     */
-    @FXML
-    private void showUrgentQuestions() {
-        currentFilter = "urgent";
-        updateActiveTab(urgentBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Update active tab styling.
-     */
-    private void updateActiveTab(Button activeButton) {
-        allBtn.getStyleClass().remove("active-tab");
-        answeredBtn.getStyleClass().remove("active-tab");
-        unansweredBtn.getStyleClass().remove("active-tab");
-        urgentBtn.getStyleClass().remove("active-tab");
+    private void applyFilter() {
+        String selectedFilter = filterComboBox.getValue();
+        if (selectedFilter == null) return;
         
-        activeButton.getStyleClass().add("active-tab");
+        switch (selectedFilter) {
+            case "All" -> currentFilter = "all";
+            case "Answered" -> currentFilter = "answered";
+            case "Unanswered" -> currentFilter = "unanswered";
+            case "Urgent" -> currentFilter = "urgent";
+        }
+        
+        displayQuestions(allQuestions);
     }
     
     /**
@@ -292,7 +296,7 @@ public class MyQuestionsController {
     @FXML
     private void askQuestion() {
         try {
-            Main.switchScene("AskQuestion.fxml", "KnA - Ask Question");
+            Main.switchScene("/fxml/AskQuestion.fxml", "KnA - Ask Question");
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to open Ask Question page.");
@@ -325,7 +329,7 @@ public class MyQuestionsController {
     @FXML
     private void goBack() {
         try {
-            Main.switchScene("Dashboard.fxml", "KnA - Dashboard");
+            Main.switchScene("/fxml/Dashboard.fxml", "KnA - Dashboard");
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to return to dashboard.");
@@ -338,7 +342,7 @@ public class MyQuestionsController {
     private void goToLogin() {
         try {
             SessionManager.getInstance().clearSession();
-            Main.switchScene("Login.fxml", "KnA - Login");
+            Main.switchScene("/fxml/Login.fxml", "KnA - Login");
         } catch (Exception e) {
             e.printStackTrace();
         }

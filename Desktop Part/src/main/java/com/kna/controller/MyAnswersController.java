@@ -14,8 +14,10 @@ import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -250,12 +252,46 @@ public class MyAnswersController {
      */
     private void viewQuestion(int questionId) {
         try {
-            SessionManager.getInstance().setAttribute("viewQuestionId", questionId);
-            Main.switchScene("QuestionDetail.fxml", "KnA - Question Details");
+            // Try to find the Dashboard's content area (when loaded inside Dashboard)
+            StackPane dashboardContentArea = findDashboardContentArea();
+            
+            if (dashboardContentArea != null) {
+                // Load into Dashboard's content area
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/QuestionDetail.fxml"));
+                Parent questionView = loader.load();
+                
+                QuestionDetailController controller = loader.getController();
+                controller.loadQuestion(questionId);
+                
+                dashboardContentArea.getChildren().clear();
+                dashboardContentArea.getChildren().add(questionView);
+            } else {
+                // Fallback to switching scene
+                SessionManager.getInstance().setAttribute("viewQuestionId", questionId);
+                Main.switchScene("/fxml/QuestionDetail.fxml", "KnA - Question Details");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to open question.");
         }
+    }
+    
+    /**
+     * Find the Dashboard's content area by traversing up the scene graph.
+     */
+    private StackPane findDashboardContentArea() {
+        try {
+            javafx.scene.Node node = answersList;
+            while (node != null) {
+                if (node instanceof StackPane && node.getId() != null && node.getId().equals("contentArea")) {
+                    return (StackPane) node;
+                }
+                node = node.getParent();
+            }
+        } catch (Exception e) {
+            // Ignore and return null
+        }
+        return null;
     }
     
     /**
