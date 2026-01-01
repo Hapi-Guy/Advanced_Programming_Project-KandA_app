@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 
@@ -20,6 +21,8 @@ public class LoginController {
     @FXML private Button loginButton;
     @FXML private Hyperlink registerLink;
     @FXML private Label errorLabel;
+    @FXML private RadioButton userRadioButton;
+    @FXML private RadioButton adminRadioButton;
     
     private final AuthService authService;
 
@@ -55,9 +58,27 @@ public class LoginController {
         // Disable login button
         loginButton.setDisable(true);
         
+        // Determine selected login type
+        boolean isAdminLogin = adminRadioButton.isSelected();
+        
         try {
             // Attempt login
             User user = authService.login(email, password);
+            
+            // Validate login type matches user role
+            if (isAdminLogin && !user.isAdmin()) {
+                // Admin login selected but user is not admin
+                showError("Invalid email or password");
+                loginButton.setDisable(false);
+                return;
+            }
+            
+            if (!isAdminLogin && user.isAdmin()) {
+                // User login selected but account is admin
+                showError("Invalid email or password");
+                loginButton.setDisable(false);
+                return;
+            }
             
             // Show success message
             ToastNotification.showSuccess("Welcome back, " + user.getName() + "!");

@@ -54,11 +54,36 @@ public class Main extends Application {
      */
     public static void switchScene(String fxmlPath, String title) {
         try {
+            // Save current window state BEFORE changing scene
+            boolean wasMaximized = primaryStage.isMaximized();
+            boolean wasFullScreen = primaryStage.isFullScreen();
+            double currentWidth = primaryStage.getWidth();
+            double currentHeight = primaryStage.getHeight();
+            double currentX = primaryStage.getX();
+            double currentY = primaryStage.getY();
+            
             Parent root = FXMLLoader.load(Main.class.getResource(fxmlPath));
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Main.class.getResource("/css/application.css").toExternalForm());
+            
             primaryStage.setScene(scene);
             primaryStage.setTitle(title);
+            
+            // Restore window state AFTER scene is set
+            if (!wasFullScreen && !wasMaximized) {
+                primaryStage.setWidth(currentWidth);
+                primaryStage.setHeight(currentHeight);
+                primaryStage.setX(currentX);
+                primaryStage.setY(currentY);
+            }
+            
+            if (wasMaximized) {
+                primaryStage.setMaximized(true);
+            }
+            
+            if (wasFullScreen) {
+                primaryStage.setFullScreen(true);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to switch scene: " + e.getMessage());

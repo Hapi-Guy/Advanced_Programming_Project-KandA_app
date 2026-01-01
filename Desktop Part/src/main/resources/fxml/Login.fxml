@@ -33,6 +33,16 @@
                 
                 <!-- Login Form -->
                 <VBox spacing="15" prefWidth="350">
+                    <Label text="Login as"/>
+                    <HBox spacing="30" alignment="CENTER_LEFT">
+                        <RadioButton fx:id="userRadioButton" text="User" selected="true">
+                            <toggleGroup>
+                                <ToggleGroup fx:id="loginTypeGroup"/>
+                            </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="adminRadioButton" text="Admin" toggleGroup="$loginTypeGroup"/>
+                    </HBox>
+                    
                     <Label text="Email"/>
                     <TextField fx:id="emailField" promptText="Enter your email"/>
                     
