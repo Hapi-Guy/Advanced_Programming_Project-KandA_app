@@ -143,7 +143,6 @@
                         <HBox spacing="15" alignment="CENTER_LEFT">
                             <Label text="User Management" styleClass="section-title"/>
                             <Region HBox.hgrow="ALWAYS"/>
-                            <Button text="Show Passwords" styleClass="warning-button" onAction="#showPasswords"/>
                             <TextField fx:id="userSearchField" promptText="Search users..." prefWidth="250"/>
                             <Button text="Search" styleClass="secondary-button" onAction="#searchUsers"/>
                         </HBox>

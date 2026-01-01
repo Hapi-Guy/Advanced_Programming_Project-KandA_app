@@ -100,6 +100,14 @@ public class UserDAO {
     }
 
     /**
+     * Update user password (PLAIN TEXT)
+     */
+    public void updatePassword(int userId, String newPassword) throws SQLException {
+        String sql = "UPDATE users SET password_hash = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+        dbManager.executeUpdate(sql, newPassword, userId);
+    }
+    
+    /**
      * Update user coins
      */
     public boolean updateCoins(int userId, int newBalance) throws SQLException {

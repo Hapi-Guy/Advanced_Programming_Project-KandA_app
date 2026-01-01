@@ -28,6 +28,9 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.TableCell;
+import javafx.util.Callback;
+import javafx.geometry.Pos;
 
 /**
  * Controller for Admin Panel.
@@ -136,13 +139,42 @@ public class AdminPanelController {
         userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
         userNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         userEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        userPasswordCol.setCellValueFactory(new PropertyValueFactory<>("passwordHash"));
         userDeptCol.setCellValueFactory(new PropertyValueFactory<>("department"));
         userCoinsCol.setCellValueFactory(new PropertyValueFactory<>("coins"));
         userReputationCol.setCellValueFactory(new PropertyValueFactory<>("reputation"));
         userStatusCol.setCellValueFactory(cellData -> 
             new javafx.beans.property.SimpleStringProperty(cellData.getValue().isActive() ? "Active" : "Inactive")
         );
+        
+        // Add Reset Password button to actions column
+        Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = new Callback<>() {
+            @Override
+            public TableCell<User, Void> call(final TableColumn<User, Void> param) {
+                final TableCell<User, Void> cell = new TableCell<>() {
+                    private final Button resetBtn = new Button("Reset Password");
+                    {
+                        resetBtn.getStyleClass().add("warning-button");
+                        resetBtn.setOnAction(event -> {
+                            User user = getTableView().getItems().get(getIndex());
+                            resetPassword(user);
+                        });
+                    }
+                    
+                    @Override
+                    public void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(resetBtn);
+                            setAlignment(Pos.CENTER);
+                        }
+                    }
+                };
+                return cell;
+            }
+        };
+        userActionsCol.setCellFactory(cellFactory);
         
         // Questions table
         questionIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -248,17 +280,18 @@ public class AdminPanelController {
     }
     
     /**
-     * Show/hide password column in users table.
+     * Reset user password to "test123".
      */
-    @FXML
-    private void showPasswords() {
-        boolean isVisible = userPasswordCol.isVisible();
-        userPasswordCol.setVisible(!isVisible);
+    private void resetPassword(User user) {
+        if (user == null) return;
         
-        if (!isVisible) {
-            showSuccess("Passwords are now visible in the table");
-        } else {
-            showInfo("Passwords are now hidden");
+        try {
+            // Set password to default
+            userDAO.updatePassword(user.getId(), "test123");
+            showSuccess("Password reset for user: " + user.getName());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            showError("Failed to reset password for user: " + user.getName());
         }
     }
     
