@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToHeight="true" fitToWidth="true" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.QuestionDetailController">
+    
+    <VBox spacing="20">
+        <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+        </padding>
+        
+        <!-- Back Button -->
+        <Button onAction="#goBack" styleClass="button-secondary" text="← Back to Feed" />
+        
+        <!-- Question Card -->
+        <VBox fx:id="questionCard" spacing="15" styleClass="card">
+            <Label fx:id="titleLabel" styleClass="label-header" wrapText="true" />
+            
+            <!-- Meta Info -->
+            <HBox spacing="15">
+                <Label fx:id="categoryBadge" styleClass="badge" />
+                <Label fx:id="coinRewardLabel" />
+                <Label fx:id="urgentBadge" styleClass="badge, badge-urgent" visible="false" />
+                <Label fx:id="answeredBadge" styleClass="badge, badge-success" visible="false" />
+            </HBox>
+            
+            <Separator />
+            
+            <Label fx:id="descriptionLabel" style="-fx-font-size: 14px;" wrapText="true" />
+         <Button mnemonicParsing="false" text="Button" />
+            
+            <!-- Question Image -->
+            <VBox fx:id="imageContainer" visible="false" />
+            
+            <HBox spacing="10">
+                <Label fx:id="askedByLabel" styleClass="label-secondary" />
+                <Label fx:id="timeLabel" styleClass="label-secondary" />
+                <Label fx:id="viewCountLabel" styleClass="label-secondary" />
+            </HBox>
+        </VBox>
+         <Label styleClass="label-header" text="Your Answer" />
+         <TextArea fx:id="answerTextArea" prefRowCount="6" promptText="Write your answer here..." wrapText="true" />
+         <Button onAction="#submitAnswer" styleClass="button-success" text="Submit Answer" />
+        
+        <!-- Answers Section -->
+        <VBox spacing="15">
+            <Label fx:id="answersHeaderLabel" styleClass="label-header" text="Answers" />
+            <VBox fx:id="answersContainer" spacing="15" />
+        </VBox>
+        
+                             <!-- Answer Form (if not question owner) -->
+        <VBox fx:id="answerFormContainer" spacing="15" styleClass="card" visible="false" />
+    </VBox>
+</ScrollPane>

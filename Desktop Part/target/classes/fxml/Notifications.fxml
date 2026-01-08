@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kna.controller.NotificationsController"
+            styleClass="root-pane">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label text="Notifications" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="Mark All as Read" styleClass="secondary-button" onAction="#markAllAsRead"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="0" styleClass="content-container">
+            
+            <!-- Filter Tabs -->
+            <HBox styleClass="filter-tabs" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Button fx:id="allTabBtn" text="All" styleClass="filter-tab,active-tab" onAction="#showAllNotifications"/>
+                <Button fx:id="unreadTabBtn" text="Unread" styleClass="filter-tab" onAction="#showUnreadNotifications"/>
+                <Button fx:id="answersTabBtn" text="Answers" styleClass="filter-tab" onAction="#showAnswerNotifications"/>
+                <Button fx:id="coinsTabBtn" text="Coins" styleClass="filter-tab" onAction="#showCoinNotifications"/>
+            </HBox>
+            
+            <!-- Notifications List -->
+            <ScrollPane fx:id="notificationsScrollPane" fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                <VBox fx:id="notificationsList" spacing="0" styleClass="notifications-list"/>
+            </ScrollPane>
+            
+            <!-- Empty State -->
+            <StackPane fx:id="emptyStatePane" managed="false" visible="false">
+                <padding>
+                    <Insets top="50"/>
+                </padding>
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="📭" style="-fx-font-size: 48px;"/>
+                    <Label text="No notifications yet" styleClass="empty-state-text"/>
+                    <Label text="You'll see notifications here when you get answers, votes, or coin updates" 
+                           styleClass="empty-state-subtext" wrapText="true" textAlignment="CENTER" maxWidth="400"/>
+                </VBox>
+            </StackPane>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>

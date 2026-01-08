@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kna.controller.MyQuestionsController"
+            styleClass="root-pane">
+    
+    <!-- Top Bar -->
+    <top>
+        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+            <padding>
+                <Insets top="15" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <Label text="My Questions" styleClass="page-title"/>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
+    </top>
+    
+    <!-- Main Content -->
+    <center>
+        <VBox spacing="0" styleClass="content-container">
+            
+            <!-- Stats Bar -->
+            <HBox styleClass="stats-bar" spacing="30" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="20" right="30" bottom="20" left="30"/>
+                </padding>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Total Questions" styleClass="stat-label"/>
+                    <Label fx:id="totalQuestionsLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Answered" styleClass="stat-label"/>
+                    <Label fx:id="answeredLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Unevaluated" styleClass="stat-label"/>
+                    <Label fx:id="unevaluatedLabel" text="0" styleClass="stat-value-large"/>
+                </VBox>
+                
+                <Separator orientation="VERTICAL"/>
+                
+                <VBox spacing="5" alignment="CENTER">
+                    <Label text="Coins Spent" styleClass="stat-label"/>
+                    <HBox spacing="5" alignment="CENTER">
+                        <Label text="💰" styleClass="coin-icon-small"/>
+                        <Label fx:id="coinsSpentLabel" text="0" styleClass="stat-value-large"/>
+                    </HBox>
+                </VBox>
+            </HBox>
+            
+            <!-- Filter Bar -->
+            <HBox styleClass="filter-bar" spacing="10" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="15" right="20" bottom="15" left="20"/>
+                </padding>
+                
+                <Label text="Filter:" styleClass="filter-label"/>
+                <ComboBox fx:id="filterComboBox" onAction="#applyFilter" prefWidth="150"/>
+            </HBox>
+            
+            <!-- Questions List -->
+            <ScrollPane fx:id="questionsScrollPane" fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
+                <VBox fx:id="questionsList" spacing="10" styleClass="questions-list">
+                    <padding>
+                        <Insets top="10" right="20" bottom="20" left="20"/>
+                    </padding>
+                </VBox>
+            </ScrollPane>
+            
+            <!-- Empty State -->
+            <StackPane fx:id="emptyStatePane" managed="false" visible="false">
+                <padding>
+                    <Insets top="50"/>
+                </padding>
+                <VBox spacing="15" alignment="CENTER">
+                    <Label text="❓" style="-fx-font-size: 48px;"/>
+                    <Label text="No questions yet" styleClass="empty-state-text"/>
+                    <Label text="Start by asking your first question!" 
+                           styleClass="empty-state-subtext"/>
+                    <Button text="Ask Question" styleClass="primary-button" onAction="#askQuestion"/>
+                </VBox>
+            </StackPane>
+            
+        </VBox>
+    </center>
+    
+</BorderPane>
