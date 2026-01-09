@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Question Card Item - Quora-style Design -->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/QuestionCardStyle"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- User Info Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- User Avatar -->
+            <ImageView
+                android:id="@+id/userAvatar"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@android:drawable/ic_menu_myplaces"
+                android:contentDescription="@string/profile" />
+
+            <!-- User Name and Department -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/userName"
+                    style="@style/UserNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="John Doe" />
+
+                <TextView
+                    android:id="@+id/userDepartment"
+                    style="@style/MetadataText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="CSE • Year 3" />
+            </LinearLayout>
+
+            <!-- Timestamp -->
+            <TextView
+                android:id="@+id/timestamp"
+                style="@style/MetadataText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="2h ago" />
+
+        </LinearLayout>
+
+        <!-- Question Title (Bold) -->
+        <TextView
+            android:id="@+id/questionTitle"
+            style="@style/QuestionTitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            tools:text="How does Room Database work in Android?" />
+
+        <!-- Question Description (Preview - 2-3 lines) -->
+        <TextView
+            android:id="@+id/questionDescription"
+            style="@style/QuestionDescriptionText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            tools:text="I'm trying to understand how Room Database works with LiveData and ViewModel. Can someone explain the architecture..." />
+
+        <!-- Badges Row (Category, Urgent, Coins) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <!-- Category Tag -->
+            <TextView
+                android:id="@+id/categoryTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tag_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:textSize="11sp"
+                android:textColor="@color/accent"
+                android:textStyle="bold"
+                tools:text="Technical" />
+
+            <!-- Urgent Badge -->
+            <TextView
+                android:id="@+id/urgentBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/urgent_badge_background"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:text="@string/urgent"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Coin Reward Indicator -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/btn_star_big_on"
+                    android:tint="@color/coin_badge"
+                    android:contentDescription="@string/coins" />
+
+                <TextView
+                    android:id="@+id/coinReward"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/coin_badge"
+                    tools:text="30" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Metadata Row (Answer count) -->
+        <TextView
+            android:id="@+id/answerCount"
+            style="@style/MetadataText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="5 answers" />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

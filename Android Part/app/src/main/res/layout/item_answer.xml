@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- Answer Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/answerUserName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                tools:text="Jane Smith" />
+
+            <TextView
+                android:id="@+id/answerUserDept"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                tools:text="EEE • Year 4" />
+
+        </LinearLayout>
+
+        <!-- Answer Content -->
+        <TextView
+            android:id="@+id/answerContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp"
+            tools:text="Here's how to implement a binary search tree..." />
+
+        <!-- Answer Actions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Upvote Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnUpvote"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="80dp"
+                android:text="👍"
+                android:textSize="12sp"
+                style="@style/Widget.Material3.Button.TextButton"
+                tools:text="👍 5" />
+
+            <!-- Downvote Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDownvote"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:minWidth="60dp"
+                android:text="👎"
+                android:textSize="12sp"
+                style="@style/Widget.Material3.Button.TextButton" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Accept Answer Button (only visible to question owner) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAcceptAnswer"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="✓ Accept"
+                android:textSize="12sp"
+                android:visibility="gone"
+                style="@style/Widget.Material3.Button.TonalButton"
+                tools:visibility="visible" />
+
+            <!-- Accepted Badge -->
+            <TextView
+                android:id="@+id/acceptedBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/urgent_badge_background"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="✓ ACCEPTED"
+                android:textSize="12sp"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:visibility="gone"
+                tools:visibility="visible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
