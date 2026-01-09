@@ -15,8 +15,7 @@
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             
-            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
-            <Region HBox.hgrow="ALWAYS"/>
+
             <Label text="🏆 Leaderboard" styleClass="page-title"/>
             <Region HBox.hgrow="ALWAYS"/>
         </HBox>

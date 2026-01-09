@@ -35,10 +35,15 @@ public interface AnswerDao {
     
     /**
      * Get all answers for a question with user info
+     * Uses LEFT JOIN to ensure answers are ALWAYS returned even if user data is missing
      */
-    @Query("SELECT a.*, u.name as user_name, u.department as user_department, u.reputation as user_reputation " +
+    @Query("SELECT a.*, " +
+           "COALESCE(u.name, 'Unknown User') as user_name, " +
+           "COALESCE(u.department, 'N/A') as user_department, " +
+           "COALESCE(u.academic_year, 0) as user_academicYear, " +
+           "COALESCE(u.reputation, 0) as user_reputation " +
            "FROM answers a " +
-           "INNER JOIN users u ON a.user_id = u.user_id " +
+           "LEFT JOIN users u ON a.user_id = u.user_id " +
            "WHERE a.question_id = :questionId " +
            "ORDER BY a.is_accepted DESC, (a.upvotes - a.downvotes) DESC, a.created_at ASC")
     LiveData<List<AnswerWithUser>> getAnswersForQuestion(long questionId);

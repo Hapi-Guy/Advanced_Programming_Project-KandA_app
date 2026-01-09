@@ -16,8 +16,6 @@
                 <Insets top="15" right="20" bottom="15" left="20"/>
             </padding>
             
-            <Button fx:id="backButton" text="← Back" styleClass="secondary-button" onAction="#goBack"/>
-            <Region HBox.hgrow="ALWAYS"/>
             <Label text="Ask a Question" styleClass="page-title"/>
             <Region HBox.hgrow="ALWAYS"/>
             
@@ -132,7 +130,7 @@
                         <padding>
                             <Insets top="10"/>
                         </padding>
-                        <Button text="Cancel" styleClass="secondary-button" onAction="#goBack"/>
+                        <Button text="Cancel" styleClass="secondary-button" onAction="#handleCancel"/>
                         <Button text="Post Question" styleClass="primary-button" onAction="#submitQuestion"/>
                     </HBox>
                 </VBox>

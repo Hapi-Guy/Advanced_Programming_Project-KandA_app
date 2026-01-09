@@ -1,24 +1,33 @@
 package com.kna.controller;
 
+import java.sql.SQLException;
+import java.util.List;
+
 import com.kna.Main;
+import com.kna.dao.NotificationDAO;
 import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.service.AuthService;
 import com.kna.service.QuestionService;
-import com.kna.dao.NotificationDAO;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.Font;
-
-import java.sql.SQLException;
-import java.util.List;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 /**
  * DashboardController - Main dashboard controller
@@ -32,6 +41,7 @@ public class DashboardController {
     @FXML private Button profileButton;
     @FXML private Button adminPanelButton;
     @FXML private StackPane contentArea;
+    @FXML private ScrollPane homeScrollPane;
     @FXML private ComboBox<String> categoryFilter;
     @FXML private CheckBox urgentOnlyCheckbox;
     @FXML private CheckBox unansweredOnlyCheckbox;
@@ -59,7 +69,7 @@ public class DashboardController {
         }
         
         // Populate category filter
-        categoryFilter.getItems().addAll("All", "CSE", "EEE", "CE", "ME", "IPE", "TE", "Other");
+//        categoryFilter.getItems().addAll("All", "CSE", "EEE", "CE", "ME", "IPE", "TE", "Other");
         
         // Update UI with user info
         updateUserInfo();
@@ -126,7 +136,7 @@ public class DashboardController {
             String category = categoryFilter.getValue();
             boolean urgentOnly = urgentOnlyCheckbox.isSelected();
             boolean unansweredOnly = unansweredOnlyCheckbox.isSelected();
-            
+
             List<Question> questions = questionService.getQuestions(
                 category,
                 urgentOnly ? true : null,
@@ -134,19 +144,19 @@ public class DashboardController {
                 50,
                 0
             );
-            
+
             if (questions.isEmpty()) {
                 Label emptyLabel = new Label("No questions found. Be the first to ask!");
                 emptyLabel.setStyle("-fx-font-size: 16px; -fx-text-fill: #757575;");
                 questionFeedContainer.getChildren().add(emptyLabel);
                 return;
             }
-            
+
             for (Question question : questions) {
                 VBox questionCard = createQuestionCard(question);
                 questionFeedContainer.getChildren().add(questionCard);
             }
-            
+
         } catch (Exception e) {
             ToastNotification.showError("Failed to load questions: " + e.getMessage());
             e.printStackTrace();
@@ -285,7 +295,11 @@ public class DashboardController {
 
     @FXML
     private void showHome() {
-        Main.switchScene("/fxml/Dashboard.fxml", "KnA - Dashboard");
+        // Show the home view without reloading the entire scene
+        contentArea.getChildren().clear();
+        contentArea.getChildren().add(homeScrollPane);
+        loadQuestionFeed();
+        updateUserInfo();
     }
 
     @FXML
@@ -300,8 +314,14 @@ public class DashboardController {
             
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AskQuestion.fxml"));
             Parent askView = loader.load();
+            
+            // Wrap in ScrollPane for proper scrolling
+            ScrollPane scrollPane = new ScrollPane(askView);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setStyle("-fx-background-color: transparent;");
+            
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(askView);
+            contentArea.getChildren().add(scrollPane);
         } catch (Exception e) {
             ToastNotification.showError("Failed to load ask question form");
             e.printStackTrace();
@@ -313,6 +333,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MyQuestions.fxml"));
             Parent myQuestionsView = loader.load();
+            
+            // MyQuestions already has its own ScrollPane, so just add it directly
             contentArea.getChildren().clear();
             contentArea.getChildren().add(myQuestionsView);
         } catch (Exception e) {
@@ -320,12 +342,14 @@ public class DashboardController {
             e.printStackTrace();
         }
     }
-
+    
     @FXML
     private void showMyAnswers() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/MyAnswers.fxml"));
             Parent myAnswersView = loader.load();
+            
+            // MyAnswers already has its own ScrollPane, so just add it directly
             contentArea.getChildren().clear();
             contentArea.getChildren().add(myAnswersView);
         } catch (Exception e) {
@@ -339,6 +363,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Leaderboard.fxml"));
             Parent leaderboardView = loader.load();
+            
+            // Leaderboard already has its own structure, add directly
             contentArea.getChildren().clear();
             contentArea.getChildren().add(leaderboardView);
         } catch (Exception e) {
@@ -352,6 +378,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/CoinPurchase.fxml"));
             Parent coinPurchaseView = loader.load();
+            
+            // CoinPurchase already has ScrollPane, add directly
             contentArea.getChildren().clear();
             contentArea.getChildren().add(coinPurchaseView);
         } catch (Exception e) {
@@ -370,6 +398,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/AdminPanel.fxml"));
             Parent adminView = loader.load();
+            
+            // AdminPanel already has its own structure, add directly
             contentArea.getChildren().clear();
             contentArea.getChildren().add(adminView);
         } catch (Exception e) {

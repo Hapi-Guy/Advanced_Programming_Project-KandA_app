@@ -103,16 +103,12 @@ public class AuthService {
             throw new Exception("Invalid email or password");
         }
         
-        // Verify password - simple string comparison for testing
-        // For production, use: PasswordHasher.verifyPassword(password, user.getPasswordHash())
+        // simple string comparison for testing
         if (!password.equals(user.getPasswordHash())) {
             throw new Exception("Invalid email or password");
         }
         
-        // Check if account is active
-        if (!user.isActive()) {
-            throw new Exception("Account is deactivated");
-        }
+
         
         // Set session
         SessionManager.getInstance().setCurrentUser(user);

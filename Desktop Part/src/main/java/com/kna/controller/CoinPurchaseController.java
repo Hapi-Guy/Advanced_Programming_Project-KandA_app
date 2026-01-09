@@ -43,10 +43,7 @@ public class CoinPurchaseController {
     private void initialize() {
         currentUser = SessionManager.getInstance().getCurrentUser();
         
-        if (currentUser == null) {
-            ToastNotification.showError("Please login first");
-            return;
-        }
+
         
         currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
         
@@ -84,11 +81,11 @@ public class CoinPurchaseController {
         nameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
         
         // Coin amount
-        Label coinsLabel = new Label("💰 " + pkg.coins + " Coins");
+        Label coinsLabel = new Label( pkg.coins + " Coins");
         coinsLabel.setStyle("-fx-font-size: 16px; -fx-background-color: #FFF3E0; -fx-text-fill: #E65100; -fx-padding: 8px 15px; -fx-background-radius: 15px;");
         
         // Price
-        Label priceLabel = new Label("৳ " + pkg.price);
+        Label priceLabel = new Label("" + pkg.price);
         priceLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
         
         // Select button
@@ -97,7 +94,6 @@ public class CoinPurchaseController {
         
         card.getChildren().addAll(nameLabel, coinsLabel, priceLabel, selectButton);
         
-        // Hover effect
         card.setOnMouseEntered(e -> card.setStyle(card.getStyle() + "-fx-background-color: #E3F2FD;"));
         card.setOnMouseExited(e -> card.setStyle(card.getStyle() + "-fx-background-color: white;"));
         card.setOnMouseClicked(e -> selectPackage(pkg));
@@ -117,10 +113,7 @@ public class CoinPurchaseController {
 
     @FXML
     private void handlePurchase() {
-        if (selectedPackage == null) {
-            ToastNotification.showWarning("Please select a package first");
-            return;
-        }
+
         
         // Show confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -131,9 +124,7 @@ public class CoinPurchaseController {
         if (confirmAlert.showAndWait().get() != ButtonType.OK) {
             return;
         }
-        
-        // Simulate payment screen
-        simulatePayment();
+
     }
 
     private void simulatePayment() {
@@ -177,9 +168,9 @@ public class CoinPurchaseController {
             currentUser = SessionManager.getInstance().getCurrentUser();
             currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
             
-            // Show success
-            ToastNotification.showSuccess("Purchase successful! You now have " + 
-                                        currentUser.getCoins() + " Coins");
+//            // Show success
+//            ToastNotification.showSuccess("Purchase successful! You now have " +
+//                                        currentUser.getCoins() + " Coins");
             
             // Reset selection
             selectedPackageInfo.setVisible(false);

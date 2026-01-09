@@ -212,8 +212,8 @@ public class AskQuestionController {
                 
                 showSuccess("Question posted successfully! " + cost + " coins deducted.");
                 
-                // Navigate back to dashboard
-                goBack();
+                // Clear all fields after successful submission
+                clearAllFields();
             } else {
                 showError("Failed to post question. Please try again.");
             }
@@ -222,6 +222,31 @@ public class AskQuestionController {
             e.printStackTrace();
             showError("Error: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Clear all form fields.
+     */
+    @FXML
+    private void clearAllFields() {
+        titleField.clear();
+        descriptionArea.clear();
+        categoryCombo.setValue(null);
+        urgentCheckbox.setSelected(false);
+        selectedImageFile = null;
+        imageFileLabel.setText("No file chosen");
+        imagePreviewPane.setManaged(false);
+        imagePreviewPane.setVisible(false);
+        imagePreview.setImage(null);
+        updateCostDisplay();
+    }
+    
+    /**
+     * Cancel button - clear all fields.
+     */
+    @FXML
+    private void handleCancel() {
+        clearAllFields();
     }
     
     /**

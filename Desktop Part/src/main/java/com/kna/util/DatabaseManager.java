@@ -199,10 +199,10 @@ public class DatabaseManager {
     }
 
     /**
-     * Execute an update and return generated key
+     * Execute an update and return generated key (SQLite-compatible)
      */
     public int executeUpdateWithKey(String sql, Object... params) throws SQLException {
-        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             // Set parameters
             for (int i = 0; i < params.length; i++) {
                 pstmt.setObject(i + 1, params[i]);
@@ -214,9 +214,11 @@ public class DatabaseManager {
                 throw new SQLException("Insert failed, no rows affected.");
             }
             
-            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    return generatedKeys.getInt(1);
+            // Use SQLite's last_insert_rowid() to get the generated key
+            try (Statement stmt = connection.createStatement();
+                 ResultSet rs = stmt.executeQuery("SELECT last_insert_rowid()")) {
+                if (rs.next()) {
+                    return rs.getInt(1);
                 } else {
                     throw new SQLException("Insert failed, no ID obtained.");
                 }

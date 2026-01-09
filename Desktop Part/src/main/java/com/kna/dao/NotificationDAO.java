@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * NotificationDAO - Data Access Object for Notification entity
  */
-public class NotificationDAO {
+public class  NotificationDAO {
     
     private final DatabaseManager dbManager;
 
