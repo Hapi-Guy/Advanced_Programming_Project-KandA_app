@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary colors -->
+    <color name="primary">#B92B27</color>
+    <color name="primary_dark">#8B1F1C</color>
+    <color name="primary_light">#E63A36</color>
+    
+    <!-- Accent colors -->
+    <color name="accent">#2E69FF</color>
+    <color name="accent_dark">#1A4ACC</color>
+    
+    <!-- Background colors -->
+    <color name="background">#F5F5F5</color>
+    <color name="surface">#FFFFFF</color>
+    
+    <!-- Text colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_tertiary">#9E9E9E</color>
+    
+    <!-- Basic colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    
+    <!-- Chip colors -->
+    <color name="chip_background">#E8F0FE</color>
+    <color name="chip_stroke">#C5D9F7</color>
+    
+    <!-- Badge colors -->
+    <color name="urgent_badge">#FF5722</color>
+    <color name="coin_badge">#FFB300</color>
+    
+    <!-- Status colors -->
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
+    <color name="warning">#FF9800</color>
+</resources>

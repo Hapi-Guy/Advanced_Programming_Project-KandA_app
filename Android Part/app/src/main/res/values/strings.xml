@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">KnA</string>
+    
+    <!-- Auth Screens -->
+    <string name="login">Login</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="name">Full Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="department">Department</string>
+    <string name="academic_year">Academic Year</string>
+    <string name="user">User</string>
+    <string name="admin">Admin</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="already_have_account">Already have an account?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="sign_in">Sign In</string>
+    
+    <!-- Home Screen -->
+    <string name="ask_hint">What do you want to ask or share?</string>
+    <string name="for_you">For You</string>
+    <string name="following">Following</string>
+    <string name="my_dept">My Dept</string>
+    <string name="urgent">Urgent</string>
+    <string name="answers">answers</string>
+    <string name="coins">Coins</string>
+    
+    <!-- Bottom Navigation -->
+    <string name="home">Home</string>
+    <string name="notifications">Notifications</string>
+    <string name="ask">Ask</string>
+    <string name="leaderboard">Leaderboard</string>
+    <string name="profile">Profile</string>
+    
+    <!-- Ask Question -->
+    <string name="question_title">Question Title</string>
+    <string name="question_description">Describe your question in detail...</string>
+    <string name="select_category">Select Category</string>
+    <string name="mark_as_urgent">Mark as Urgent (+10 coins)</string>
+    <string name="post_question">Post Question</string>
+    <string name="cancel">Cancel</string>
+    <string name="coin_cost">Cost: %d coins</string>
+    
+    <!-- Question Detail -->
+    <string name="write_answer">Write your answer...</string>
+    <string name="submit_answer">Submit Answer</string>
+    <string name="accept_answer">Accept Answer</string>
+    <string name="upvote">Upvote</string>
+    <string name="downvote">Downvote</string>
+    <string name="rate_answer">Rate this answer</string>
+    
+    <!-- Profile -->
+    <string name="reputation">Reputation</string>
+    <string name="questions_asked">Questions Asked</string>
+    <string name="answers_given">Answers Given</string>
+    <string name="acceptance_rate">Acceptance Rate</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="logout">Logout</string>
+    
+    <!-- Leaderboard -->
+    <string name="rank">Rank</string>
+    <string name="top_contributors">Top Contributors</string>
+    
+    <!-- Notifications -->
+    <string name="no_notifications">No notifications yet</string>
+    <string name="mark_all_read">Mark all as read</string>
+    
+    <!-- Common -->
+    <string name="loading">Loading...</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="retry">Retry</string>
+    <string name="search">Search</string>
+</resources>
