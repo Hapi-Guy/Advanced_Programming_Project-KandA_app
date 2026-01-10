@@ -39,7 +39,7 @@
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:src="@android:drawable/ic_menu_myplaces"
+                        android:src="@drawable/ic_ask_avatar"
                         android:contentDescription="@string/profile" />
 
                     <!-- Ask Hint Text -->

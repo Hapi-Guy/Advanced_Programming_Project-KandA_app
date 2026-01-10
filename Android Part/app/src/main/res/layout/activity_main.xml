@@ -4,12 +4,14 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <!-- App Bar Layout -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <!-- Top Toolbar - Similar to Quora's header -->
@@ -26,35 +28,25 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <!-- Search Icon -->
-                <ImageView
-                    android:id="@+id/btnSearch"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:padding="12dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    android:contentDescription="@string/search"
-                    android:background="?attr/selectableItemBackgroundBorderless" />
-
                 <!-- App Title (Centered) -->
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="@string/app_name"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="       KnA"
                     android:textColor="@color/white"
-                    android:gravity="center" />
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
-                <!-- Add Question Icon -->
+                <!-- Notifications Icon -->
                 <ImageView
-                    android:id="@+id/btnAddQuestion"
+                    android:id="@+id/btnNotifications"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:padding="12dp"
-                    android:src="@android:drawable/ic_input_add"
-                    android:contentDescription="@string/ask"
+                    android:src="@android:drawable/ic_popup_reminder"
+                    android:contentDescription="@string/notifications"
                     android:background="?attr/selectableItemBackgroundBorderless" />
 
             </LinearLayout>

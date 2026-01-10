@@ -16,6 +16,11 @@
         <item name="windowNoTitle">true</item>
     </style>
     
+    <style name="Theme.KnA.MainActivity" parent="Theme.KnA.NoActionBar">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@color/primary</item>
+    </style>
+    
     <!-- Card style for question items (Quora-like) -->
     <style name="QuestionCardStyle">
         <item name="cardCornerRadius">8dp</item>

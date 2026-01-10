@@ -34,12 +34,8 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigation.setOnItemSelectedListener(this::onNavigationItemSelected);
         
         // Setup toolbar click listeners
-        findViewById(R.id.btnSearch).setOnClickListener(v -> {
-            // TODO: Implement search
-        });
-        
-        findViewById(R.id.btnAddQuestion).setOnClickListener(v -> {
-            startActivity(new Intent(this, AskQuestionActivity.class));
+        findViewById(R.id.btnNotifications).setOnClickListener(v -> {
+            loadFragment(new NotificationsFragment());
         });
         
         // Load home fragment by default
@@ -54,8 +50,6 @@ public class MainActivity extends AppCompatActivity {
         int itemId = item.getItemId();
         if (itemId == R.id.navigation_home) {
             fragment = new HomeFragment();
-        } else if (itemId == R.id.navigation_notifications) {
-            fragment = new NotificationsFragment();
         } else if (itemId == R.id.navigation_ask) {
             startActivity(new Intent(this, AskQuestionActivity.class));
             return false;
