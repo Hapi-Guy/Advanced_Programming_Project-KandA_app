@@ -124,4 +124,10 @@ public interface QuestionDao {
            "WHERE q.title LIKE '%' || :query || '%' OR q.description LIKE '%' || :query || '%' " +
            "ORDER BY q.is_urgent DESC, q.created_at DESC")
     LiveData<List<QuestionWithUser>> searchQuestions(String query);
+    
+    /**
+     * Get total question count for admin stats
+     */
+    @Query("SELECT COUNT(*) FROM questions")
+    int getQuestionCountSync();
 }

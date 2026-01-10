@@ -101,4 +101,10 @@ public interface AnswerDao {
      */
     @Query("SELECT COUNT(*) FROM answers WHERE question_id = :questionId")
     int getAnswerCount(long questionId);
+    
+    /**
+     * Get total answer count for admin stats
+     */
+    @Query("SELECT COUNT(*) FROM answers")
+    int getTotalAnswerCountSync();
 }

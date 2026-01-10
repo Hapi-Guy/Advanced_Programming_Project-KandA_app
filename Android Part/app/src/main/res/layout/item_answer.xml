@@ -109,6 +109,18 @@
                 android:visibility="gone"
                 tools:visibility="visible" />
 
+            <!-- Delete Answer Button (only visible to answer owner) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDeleteAnswer"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:text="🗑️"
+                android:textSize="12sp"
+                android:visibility="gone"
+                style="@style/Widget.Material3.Button.TextButton"
+                tools:visibility="visible" />
+
         </LinearLayout>
 
     </LinearLayout>

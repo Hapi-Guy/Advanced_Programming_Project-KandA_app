@@ -26,6 +26,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
         void onUpvote(long answerId);
         void onDownvote(long answerId);
         void onAcceptAnswer(long answerId);
+        void onDeleteAnswer(long answerId);
     }
     
     public AnswerAdapter(long currentUserId, long questionOwnerId, OnAnswerActionListener listener) {
@@ -66,6 +67,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
         private final MaterialButton btnUpvote;
         private final MaterialButton btnDownvote;
         private final MaterialButton btnAcceptAnswer;
+        private final MaterialButton btnDeleteAnswer;
         private final TextView acceptedBadge;
         
         public AnswerViewHolder(@NonNull View itemView) {
@@ -76,6 +78,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
             btnUpvote = itemView.findViewById(R.id.btnUpvote);
             btnDownvote = itemView.findViewById(R.id.btnDownvote);
             btnAcceptAnswer = itemView.findViewById(R.id.btnAcceptAnswer);
+            btnDeleteAnswer = itemView.findViewById(R.id.btnDeleteAnswer);
             acceptedBadge = itemView.findViewById(R.id.acceptedBadge);
         }
         
@@ -94,6 +97,7 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
             
             // Show accept button only if current user is question owner and answer not accepted
             boolean isQuestionOwner = currentUserId == questionOwnerId;
+            boolean isAnswerOwner = currentUserId == answerWithUser.answer.getUserId();
             boolean isAccepted = answerWithUser.answer.isAccepted();
             
             if (isQuestionOwner && !isAccepted) {
@@ -105,6 +109,13 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
             } else {
                 btnAcceptAnswer.setVisibility(View.GONE);
                 acceptedBadge.setVisibility(View.GONE);
+            }
+            
+            // Show delete button only if current user is answer owner
+            if (isAnswerOwner) {
+                btnDeleteAnswer.setVisibility(View.VISIBLE);
+            } else {
+                btnDeleteAnswer.setVisibility(View.GONE);
             }
             
             // Set click listeners
@@ -123,6 +134,12 @@ public class AnswerAdapter extends RecyclerView.Adapter<AnswerAdapter.AnswerView
             btnAcceptAnswer.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onAcceptAnswer(answerWithUser.answer.getAnswerId());
+                }
+            });
+            
+            btnDeleteAnswer.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onDeleteAnswer(answerWithUser.answer.getAnswerId());
                 }
             });
         }

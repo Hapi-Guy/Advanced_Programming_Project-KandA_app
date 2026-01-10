@@ -132,6 +132,21 @@
                         android:textColor="?attr/colorPrimary"
                         tools:text="🪙 30 coins reward" />
 
+                    <!-- Delete Button (visible only for question owner) -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDeleteQuestion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="Delete Question"
+                        android:textColor="@android:color/white"
+                        android:visibility="gone"
+                        app:backgroundTint="@color/error_red"
+                        app:icon="@android:drawable/ic_menu_delete"
+                        app:iconTint="@android:color/white"
+                        app:cornerRadius="8dp"
+                        style="@style/Widget.Material3.Button" />
+
                 </LinearLayout>
 
             </com.google.android.material.card.MaterialCardView>

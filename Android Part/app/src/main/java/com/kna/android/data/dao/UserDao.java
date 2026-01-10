@@ -75,6 +75,12 @@ public interface UserDao {
     @Query("SELECT COUNT(*) FROM users WHERE email = :email")
     int emailExists(String email);
     
+    @Query("SELECT * FROM users WHERE email = :email")
+    User getUserByEmailSync(String email);
+    
+    @Query("SELECT COUNT(*) FROM users")
+    int getUserCountSync();
+    
     @Query("SELECT * FROM users WHERE department = :department ORDER BY reputation DESC")
     LiveData<List<User>> getUsersByDepartment(String department);
 }

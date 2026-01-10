@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,10 +15,14 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.kna.android.R;
+import com.kna.android.data.database.KnADatabase;
+import com.kna.android.data.model.Question;
 import com.kna.android.ui.adapter.AnswerAdapter;
 import com.kna.android.ui.viewmodel.QuestionDetailViewModel;
 import com.kna.android.util.Constants;
 import com.kna.android.util.SessionManager;
+
+import java.util.concurrent.Executors;
 
 /**
  * Question Detail Activity - migrated from desktop QuestionDetailController
@@ -39,10 +44,12 @@ public class QuestionDetailActivity extends AppCompatActivity {
     private RecyclerView answersRecyclerView;
     private TextInputEditText answerInput;
     private MaterialButton btnSubmitAnswer;
+    private MaterialButton btnDeleteQuestion;
     
     private long questionId;
     private long currentUserId;
     private long questionOwnerId;
+    private Question currentQuestion;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +76,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         answersRecyclerView = findViewById(R.id.answersRecyclerView);
         answerInput = findViewById(R.id.answerInput);
         btnSubmitAnswer = findViewById(R.id.btnSubmitAnswer);
+        btnDeleteQuestion = findViewById(R.id.btnDeleteQuestion);
         
         // Initialize ViewModel
         viewModel = new ViewModelProvider(this).get(QuestionDetailViewModel.class);
@@ -100,11 +108,19 @@ public class QuestionDetailActivity extends AppCompatActivity {
             public void onAcceptAnswer(long answerId) {
                 viewModel.acceptAnswer(answerId);
             }
+            
+            @Override
+            public void onDeleteAnswer(long answerId) {
+                confirmDeleteAnswer(answerId);
+            }
         });
         answersRecyclerView.setAdapter(answerAdapter);
         
         // Submit answer button
         btnSubmitAnswer.setOnClickListener(v -> submitAnswer());
+        
+        // Delete question button
+        btnDeleteQuestion.setOnClickListener(v -> confirmDeleteQuestion());
         
         // Setup observers
         setupObservers();
@@ -121,6 +137,7 @@ public class QuestionDetailActivity extends AppCompatActivity {
         viewModel.getQuestion().observe(this, questionWithUser -> {
             if (questionWithUser != null) {
                 questionOwnerId = questionWithUser.question.getUserId();
+                currentQuestion = questionWithUser.question;
                 
                 userNameText.setText(questionWithUser.userInfo.name);
                 userDeptText.setText(questionWithUser.userInfo.department + " • Year " + 
@@ -135,6 +152,13 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     urgentBadge.setVisibility(View.VISIBLE);
                 } else {
                     urgentBadge.setVisibility(View.GONE);
+                }
+                
+                // Show delete button only for question owner
+                if (currentUserId == questionOwnerId) {
+                    btnDeleteQuestion.setVisibility(View.VISIBLE);
+                } else {
+                    btnDeleteQuestion.setVisibility(View.GONE);
                 }
                 
                 // Update adapter with question owner ID
@@ -153,6 +177,11 @@ public class QuestionDetailActivity extends AppCompatActivity {
                     @Override
                     public void onAcceptAnswer(long answerId) {
                         viewModel.acceptAnswer(answerId);
+                    }
+                    
+                    @Override
+                    public void onDeleteAnswer(long answerId) {
+                        confirmDeleteAnswer(answerId);
                     }
                 });
                 answersRecyclerView.setAdapter(answerAdapter);
@@ -227,5 +256,72 @@ public class QuestionDetailActivity extends AppCompatActivity {
         }
         
         viewModel.submitAnswer(content);
+    }
+    
+    private void confirmDeleteQuestion() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Question")
+                .setMessage("Are you sure you want to delete this question?\n\nThis will also delete all answers associated with it. This action cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> deleteQuestion())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    
+    private void deleteQuestion() {
+        if (currentQuestion == null) return;
+        
+        btnDeleteQuestion.setEnabled(false);
+        btnDeleteQuestion.setText("Deleting...");
+        
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                KnADatabase.getDatabase(this).questionDao().delete(currentQuestion);
+                
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Question deleted successfully", Toast.LENGTH_SHORT).show();
+                    finish(); // Go back to home
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    btnDeleteQuestion.setEnabled(true);
+                    btnDeleteQuestion.setText("Delete Question");
+                    Toast.makeText(this, "Failed to delete question: " + e.getMessage(), 
+                            Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
+    }
+    
+    private void confirmDeleteAnswer(long answerId) {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Answer")
+                .setMessage("Are you sure you want to delete this answer?\n\nThis action cannot be undone.")
+                .setPositiveButton("Delete", (dialog, which) -> deleteAnswer(answerId))
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    
+    private void deleteAnswer(long answerId) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                com.kna.android.data.model.Answer answer = 
+                        KnADatabase.getDatabase(this).answerDao().getAnswerByIdSync(answerId);
+                
+                if (answer != null) {
+                    KnADatabase.getDatabase(this).answerDao().delete(answer);
+                    
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Answer deleted successfully", Toast.LENGTH_SHORT).show();
+                        viewModel.reloadAnswers();
+                        reObserveAnswers();
+                    });
+                }
+            } catch (Exception e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Failed to delete answer: " + e.getMessage(), 
+                            Toast.LENGTH_SHORT).show();
+                });
+            }
+        });
     }
 }

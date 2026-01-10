@@ -5,6 +5,14 @@
     <color name="primary_dark">#8B1F1C</color>
     <color name="primary_light">#E63A36</color>
     
+    <!-- KnA Green (from app branding) -->
+    <color name="kna_green">#4CAF50</color>
+    <color name="kna_green_dark">#388E3C</color>
+    <color name="kna_green_light">#81C784</color>
+    
+    <!-- Error Red -->
+    <color name="error_red">#F44336</color>
+    
     <!-- Accent colors -->
     <color name="accent">#2E69FF</color>
     <color name="accent_dark">#1A4ACC</color>
