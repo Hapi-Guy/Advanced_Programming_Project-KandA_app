@@ -4,6 +4,7 @@ import com.kna.dao.QuestionDAO;
 import com.kna.dao.UserDAO;
 import com.kna.dao.CoinDAO;
 import com.kna.dao.NotificationDAO;
+import com.kna.dao.AnswerDAO;
 import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.model.CoinTransaction;
@@ -22,6 +23,7 @@ public class QuestionService {
     private final UserDAO userDAO;
     private final CoinDAO coinDAO;
     private final NotificationDAO notificationDAO;
+    private final AnswerDAO answerDAO;
     
     // Coin costs
     private static final int BASE_QUESTION_COST = 20;
@@ -32,6 +34,7 @@ public class QuestionService {
         this.userDAO = new UserDAO();
         this.coinDAO = new CoinDAO();
         this.notificationDAO = new NotificationDAO();
+        this.answerDAO = new AnswerDAO();
     }
 
     /**
@@ -174,7 +177,8 @@ public class QuestionService {
     }
 
     /**
-     * Delete question (admin only or question owner with no answers)
+     * Delete question (admin only or question owner)
+     * Also deletes all answers associated with the question (cascade delete)
      */
     public boolean deleteQuestion(int questionId) throws Exception {
         User currentUser = SessionManager.getInstance().getCurrentUser();
@@ -193,6 +197,10 @@ public class QuestionService {
         }
         
         try {
+            // First, delete all answers associated with this question (cascade delete)
+            answerDAO.deleteAnswersByQuestionId(questionId);
+            
+            // Then delete the question
             return questionDAO.deleteQuestion(questionId);
         } catch (SQLException e) {
             throw new Exception("Failed to delete question: " + e.getMessage());

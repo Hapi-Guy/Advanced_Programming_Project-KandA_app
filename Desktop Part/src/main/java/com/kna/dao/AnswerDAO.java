@@ -212,6 +212,16 @@ public class AnswerDAO {
     }
 
     /**
+     * Delete all answers for a specific question (cascade delete).
+     * @param questionId The question ID
+     * @return Number of answers deleted
+     */
+    public int deleteAnswersByQuestionId(int questionId) throws SQLException {
+        String sql = "DELETE FROM answers WHERE question_id = ?";
+        return dbManager.executeUpdate(sql, questionId);
+    }
+
+    /**
      * Extract Answer object from ResultSet
      */
     private Answer extractAnswerFromResultSet(ResultSet rs) throws SQLException {

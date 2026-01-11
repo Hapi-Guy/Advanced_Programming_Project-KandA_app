@@ -69,6 +69,11 @@ public class LeaderboardController {
         try {
             List<User> topUsers = userDAO.getTopUsersByReputation(50); // Get top 50
             
+            // Filter out admin users from leaderboard - admins don't compete for reputation
+            topUsers = topUsers.stream()
+                .filter(user -> !user.isAdmin())
+                .toList();
+            
             if (topUsers.isEmpty()) {
                 // Show empty message in list
                 Label emptyLabel = new Label("No users found");

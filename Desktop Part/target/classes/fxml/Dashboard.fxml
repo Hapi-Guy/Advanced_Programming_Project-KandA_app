@@ -26,7 +26,7 @@
 
             <!-- Logo Section -->
             <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #1A2530; -fx-padding: 20px;">
-                <Label style="-fx-font-size: 28px;" text="🎓" />
+                <Label style="-fx-font-size: 28px;" text="🎓" textFill="WHITE" />
                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;" text="KnA Platform" />
             </HBox>
 
@@ -42,13 +42,13 @@
             <Separator style="-fx-background-color: #37474F;" />
 
             <VBox spacing="5" style="-fx-padding: 15px 10px;">
-                <Button fx:id="adminPanelButton" alignment="CENTER_LEFT" onAction="#showAdminPanel" prefWidth="220" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;" styleClass="nav-item" text="⚙️  Admin Panel" visible="false" />
+                <Button fx:id="adminPanelButton" alignment="CENTER_LEFT" onAction="#showAdminPanel" prefWidth="220" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;" styleClass="nav-item" text="⚙ Admin Panel" visible="false" />
             </VBox>
 
             <Region VBox.vgrow="ALWAYS" />
 
             <VBox spacing="5" style="-fx-padding: 15px 10px;">
-                <Button alignment="CENTER_LEFT" onAction="#handleLogout" prefWidth="220" style="-fx-background-color: #D32F2F; -fx-text-fill: white; -fx-background-radius: 8px; -fx-padding: 12px 20px;" text="🚪  Logout" />
+                <Button alignment="CENTER_LEFT" onAction="#handleLogout" prefWidth="220" style="-fx-background-color: #D32F2F; -fx-text-fill: white; -fx-background-radius: 8px; -fx-padding: 12px 20px;" text="➜]  Logout" />
             </VBox>
         </VBox>
     </left>
@@ -59,30 +59,30 @@
             <!-- Top Bar -->
             <HBox alignment="CENTER_LEFT" prefHeight="85.0" prefWidth="875.0" spacing="20" style="-fx-background-color: white; -fx-padding: 15px 25px; -fx-border-color: #E8E8E8; -fx-border-width: 0 0 1px 0;">
                 
-                <Label styleClass="page-title" text="Dashboard" />
+                <Label styleClass="page-title" />
 
                 <Region HBox.hgrow="ALWAYS" />
 
                 <!-- Search Bar -->
-                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #F5F5F5; -fx-background-radius: 25px; -fx-padding: 8px 18px;" minWidth="200" prefWidth="280">
+                <HBox alignment="CENTER_LEFT" minWidth="200" prefWidth="280" spacing="10" style="-fx-background-color: #F5F5F5; -fx-background-radius: 25px; -fx-padding: 8px 18px;">
                     <TextField fx:id="searchField" prefWidth="200" promptText="Search questions..." style="-fx-background-color: transparent; -fx-border-width: 0;" />
                     <Button onAction="#handleSearch" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🔍" />
                 </HBox>
 
                 <!-- Coin Balance -->
-                <HBox alignment="CENTER" spacing="6" styleClass="coin-display" minWidth="80">
+                <HBox alignment="CENTER" minWidth="80" spacing="6" styleClass="coin-display">
                     <Label styleClass="coin-icon-small" text="💰" />
-                    <Label fx:id="coinLabel" styleClass="badge-text" text="100" minWidth="40" />
+                    <Label fx:id="coinLabel" minWidth="40" styleClass="badge-text" text="100" />
                 </HBox>
 
                 <!-- Reputation -->
-                <HBox alignment="CENTER" spacing="6" styleClass="reputation-display" minWidth="70">
+                <HBox alignment="CENTER" minWidth="70" spacing="6" styleClass="reputation-display">
                     <Label style="-fx-font-size: 14px;" text="⭐" />
-                    <Label fx:id="reputationLabel" style="-fx-font-weight: bold; -fx-text-fill: #2E7D32;" text="0" minWidth="40" />
+                    <Label fx:id="reputationLabel" minWidth="40" style="-fx-font-weight: bold; -fx-text-fill: #2E7D32;" text="0" />
                 </HBox>
 
                 <!-- Notifications -->
-                <StackPane minWidth="45" minHeight="45">
+                <StackPane minHeight="45" minWidth="45">
                     <Button onAction="#handleNotifications" style="-fx-background-color: #F5F5F5; -fx-background-radius: 50%; -fx-min-width: 45px; -fx-min-height: 45px; -fx-max-width: 45px; -fx-max-height: 45px; -fx-font-size: 20px; -fx-cursor: hand; -fx-border-color: #E0E0E0; -fx-border-radius: 50%; -fx-border-width: 1px; -fx-font-family: 'Segoe UI Symbol';" textFill="#ede9e9" />
                     <Label fx:id="notificationBadge" styleClass="notification-badge" visible="false" StackPane.alignment="TOP_RIGHT" />
                <Label text="🔔">
@@ -93,7 +93,7 @@
                 </StackPane>
 
                 <!-- Profile -->
-                <Button fx:id="profileButton" onAction="#handleProfile" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20px; -fx-padding: 8px 18px; -fx-font-weight: bold;" minWidth="100" maxWidth="200" />
+                <Button fx:id="profileButton" maxWidth="200" minWidth="100" onAction="#handleProfile" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20px; -fx-padding: 8px 18px; -fx-font-weight: bold;" />
             </HBox>
 
             <!-- Content Area -->
@@ -142,11 +142,11 @@
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="8">
                                     <CheckBox fx:id="urgentOnlyCheckbox" onAction="#applyFilters" styleClass="check-box" />
-                                    <Label style="-fx-font-size: 13px;" text="🔥 Show Urgent Questions Only" />
+                                    <Label style="-fx-font-size: 13px;" text="🔥 Urgent Only" />
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="8">
                                     <CheckBox fx:id="unansweredOnlyCheckbox" onAction="#applyFilters" styleClass="check-box" />
-                                    <Label style="-fx-font-size: 13px;" text="❓ Show Unanswered Questions Only" />
+                                    <Label style="-fx-font-size: 13px;" text="❓ Unanswered Only" />
                                 </HBox>
                             </HBox>
                         </VBox>

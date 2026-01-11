@@ -3,11 +3,13 @@ package com.kna.controller;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import com.kna.Main;
 import com.kna.dao.QuestionDAO;
 import com.kna.model.Question;
 import com.kna.model.User;
+import com.kna.service.QuestionService;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
 
@@ -16,7 +18,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -45,6 +49,7 @@ public class MyQuestionsController {
     @FXML private VBox questionsContainer;
     
     private QuestionDAO questionDAO;
+    private QuestionService questionService;
     private User currentUser;
     private String currentFilter = "all";
     private List<Question> allQuestions;
@@ -55,6 +60,7 @@ public class MyQuestionsController {
     @FXML
     public void initialize() {
         questionDAO = new QuestionDAO();
+        questionService = new QuestionService();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
         // Set initial active filter tab
@@ -204,7 +210,11 @@ public class MyQuestionsController {
         viewBtn.getStyleClass().add("secondary-button");
         viewBtn.setOnAction(e -> viewQuestion(question));
         
-        actionRow.getChildren().add(viewBtn);
+        Button deleteBtn = new Button("🗑 Delete");
+        deleteBtn.getStyleClass().add("danger-button");
+        deleteBtn.setOnAction(e -> deleteQuestion(question));
+        
+        actionRow.getChildren().addAll(viewBtn, deleteBtn);
         
         card.getChildren().addAll(headerRow, infoRow, actionRow);
         
@@ -250,6 +260,38 @@ public class MyQuestionsController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to open question.");
+        }
+    }
+    
+    /**
+     * Delete a question with confirmation dialog.
+     */
+    private void deleteQuestion(Question question) {
+        // Show confirmation dialog
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Question");
+        confirmDialog.setHeaderText("Are you sure you want to delete this question?");
+        confirmDialog.setContentText("\"" + question.getTitle() + "\"\n\n" +
+            "⚠️ This will also delete all answers to this question.\n" +
+            "This action cannot be undone.");
+        
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean deleted = questionService.deleteQuestion(question.getId());
+                if (deleted) {
+                    ToastNotification.show("Question deleted successfully", ToastNotification.NotificationType.SUCCESS);
+                    // Reload questions
+                    loadQuestions();
+                    loadStats();
+                } else {
+                    showError("Failed to delete question.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                showError(e.getMessage());
+            }
         }
     }
     

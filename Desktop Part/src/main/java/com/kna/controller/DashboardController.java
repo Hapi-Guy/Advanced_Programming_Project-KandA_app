@@ -100,7 +100,8 @@ public class DashboardController {
 
     private void updateUserInfo() {
         coinLabel.setText(String.valueOf(currentUser.getCoins()));
-        reputationLabel.setText(String.valueOf(currentUser.getReputation()));
+        // Admin users don't have reputation points
+        reputationLabel.setText(currentUser.isAdmin() ? "0" : String.valueOf(currentUser.getReputation()));
         profileButton.setText(currentUser.getName());
         
         // Update notification badge

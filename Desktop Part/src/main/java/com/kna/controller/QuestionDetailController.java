@@ -2,6 +2,7 @@ package com.kna.controller;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import com.kna.Main;
 import com.kna.model.Answer;
@@ -15,6 +16,7 @@ import com.kna.util.ToastNotification;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -46,6 +48,9 @@ public class QuestionDetailController {
     @FXML private VBox answerFormContainer;
     @FXML private TextArea answerTextArea;
     @FXML private Label answerErrorLabel;
+    
+    // Question Delete Button
+    @FXML private Button deleteQuestionBtn;
     
     // Answers Section
     @FXML private Label answersCountBadge;
@@ -121,6 +126,13 @@ public class QuestionDetailController {
             boolean canAnswer = currentUser.getUserId() != currentQuestion.getUserId();
             answerFormContainer.setVisible(canAnswer);
             answerFormContainer.setManaged(canAnswer);
+        }
+        
+        // Show delete button for question owner or admin
+        if (deleteQuestionBtn != null && currentUser != null) {
+            boolean canDelete = currentUser.isAdmin() || currentUser.getUserId() == currentQuestion.getUserId();
+            deleteQuestionBtn.setVisible(canDelete);
+            deleteQuestionBtn.setManaged(canDelete);
         }
     }
 
@@ -211,6 +223,14 @@ public class QuestionDetailController {
             actionsBox.getChildren().add(acceptButton);
         }
         
+        // Delete button (for answer owner or admin)
+        if (currentUser.isAdmin() || currentUser.getUserId() == answer.getUserId()) {
+            Button deleteButton = new Button("🗑 Delete");
+            deleteButton.getStyleClass().add("danger-button");
+            deleteButton.setOnAction(e -> handleDeleteAnswer(answer));
+            actionsBox.getChildren().add(deleteButton);
+        }
+        
         card.getChildren().addAll(header, contentLabel, actionsBox);
         
         return card;
@@ -296,6 +316,68 @@ public class QuestionDetailController {
                 ToastNotification.showError(e.getMessage());
             }
         });
+    }
+
+    /**
+     * Handle delete answer with confirmation dialog.
+     */
+    private void handleDeleteAnswer(Answer answer) {
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Answer");
+        confirmDialog.setHeaderText("Are you sure you want to delete this answer?");
+        
+        String contentPreview = answer.getContent();
+        if (contentPreview.length() > 100) {
+            contentPreview = contentPreview.substring(0, 97) + "...";
+        }
+        confirmDialog.setContentText("\"" + contentPreview + "\"\n\nThis action cannot be undone.");
+        
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean deleted = answerService.deleteAnswer(answer.getAnswerId());
+                if (deleted) {
+                    ToastNotification.showSuccess("Answer deleted successfully");
+                    loadAnswers();
+                } else {
+                    ToastNotification.showError("Failed to delete answer.");
+                }
+            } catch (Exception e) {
+                ToastNotification.showError(e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Handle delete question with confirmation dialog (FXML action).
+     */
+    @FXML
+    private void handleDeleteQuestion() {
+        if (currentQuestion == null) return;
+        
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Question");
+        confirmDialog.setHeaderText("Are you sure you want to delete this question?");
+        confirmDialog.setContentText("\"" + currentQuestion.getTitle() + "\"\n\n" +
+            "⚠️ This will also delete all answers to this question.\n" +
+            "This action cannot be undone.");
+        
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean deleted = questionService.deleteQuestion(currentQuestion.getQuestionId());
+                if (deleted) {
+                    ToastNotification.showSuccess("Question deleted successfully");
+                    goBack();
+                } else {
+                    ToastNotification.showError("Failed to delete question.");
+                }
+            } catch (Exception e) {
+                ToastNotification.showError(e.getMessage());
+            }
+        }
     }
 
     @FXML

@@ -6,6 +6,7 @@ import com.kna.service.AuthService;
 import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
@@ -16,11 +17,14 @@ public class LoginController {
     
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
+    @FXML private TextField passwordTextField;
+    @FXML private Button togglePasswordBtn;
     @FXML private Label errorLabel;
     @FXML private RadioButton userRadioButton;
     @FXML private RadioButton adminRadioButton;
     
     private final AuthService authService;
+    private boolean passwordVisible = false;
 
     public LoginController() {
         this.authService = new AuthService();
@@ -30,6 +34,31 @@ public class LoginController {
     private void initialize() {
         // Add enter key handler
         passwordField.setOnAction(event -> handleLogin());
+        passwordTextField.setOnAction(event -> handleLogin());
+        
+        // Bind text properties to keep password fields in sync
+        passwordTextField.textProperty().bindBidirectional(passwordField.textProperty());
+    }
+
+    @FXML
+    private void togglePasswordVisibility() {
+        passwordVisible = !passwordVisible;
+        
+        if (passwordVisible) {
+            // Show password as plain text
+            passwordTextField.setVisible(true);
+            passwordTextField.setManaged(true);
+            passwordField.setVisible(false);
+            passwordField.setManaged(false);
+            togglePasswordBtn.setText("🙈");
+        } else {
+            // Hide password
+            passwordField.setVisible(true);
+            passwordField.setManaged(true);
+            passwordTextField.setVisible(false);
+            passwordTextField.setManaged(false);
+            togglePasswordBtn.setText("👁");
+        }
     }
 
     @FXML

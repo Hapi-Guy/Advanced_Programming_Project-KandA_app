@@ -3,6 +3,7 @@ package com.kna.controller;
 import java.sql.SQLException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import com.kna.Main;
 import com.kna.dao.AnswerDAO;
@@ -10,6 +11,7 @@ import com.kna.dao.QuestionDAO;
 import com.kna.model.Answer;
 import com.kna.model.Question;
 import com.kna.model.User;
+import com.kna.service.AnswerService;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
 
@@ -18,7 +20,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -47,6 +51,7 @@ public class MyAnswersController {
     
     private AnswerDAO answerDAO;
     private QuestionDAO questionDAO;
+    private AnswerService answerService;
     private User currentUser;
     private String currentFilter = "all";
     private List<Answer> allAnswers;
@@ -58,6 +63,7 @@ public class MyAnswersController {
     public void initialize() {
         answerDAO = new AnswerDAO();
         questionDAO = new QuestionDAO();
+        answerService = new AnswerService();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
         // Set initial active filter tab
@@ -220,7 +226,11 @@ public class MyAnswersController {
         viewBtn.getStyleClass().add("secondary-button");
         viewBtn.setOnAction(e -> viewQuestion(answer.getQuestionId()));
         
-        actionRow.getChildren().add(viewBtn);
+        Button deleteBtn = new Button("🗑 Delete");
+        deleteBtn.getStyleClass().add("danger-button");
+        deleteBtn.setOnAction(e -> deleteAnswer(answer));
+        
+        actionRow.getChildren().addAll(viewBtn, deleteBtn);
         
         card.getChildren().addAll(headerRow, content, infoRow, actionRow);
         
@@ -266,6 +276,42 @@ public class MyAnswersController {
         } catch (Exception e) {
             e.printStackTrace();
             showError("Failed to open question.");
+        }
+    }
+    
+    /**
+     * Delete an answer with confirmation dialog.
+     */
+    private void deleteAnswer(Answer answer) {
+        // Show confirmation dialog
+        Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmDialog.setTitle("Delete Answer");
+        confirmDialog.setHeaderText("Are you sure you want to delete this answer?");
+        
+        String contentPreview = answer.getContent();
+        if (contentPreview.length() > 100) {
+            contentPreview = contentPreview.substring(0, 97) + "...";
+        }
+        confirmDialog.setContentText("\"" + contentPreview + "\"\n\n" +
+            "This action cannot be undone.");
+        
+        Optional<ButtonType> result = confirmDialog.showAndWait();
+        
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                boolean deleted = answerService.deleteAnswer(answer.getAnswerId());
+                if (deleted) {
+                    ToastNotification.show("Answer deleted successfully", ToastNotification.NotificationType.SUCCESS);
+                    // Reload answers
+                    loadAnswers();
+                    loadStats();
+                } else {
+                    showError("Failed to delete answer.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                showError(e.getMessage());
+            }
         }
     }
     

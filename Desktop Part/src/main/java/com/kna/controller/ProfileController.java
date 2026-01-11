@@ -94,7 +94,8 @@ public class ProfileController {
         usernameDisplayLabel.setText(currentUser.getName());
         emailDisplayLabel.setText(currentUser.getEmail());
         coinBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
-        reputationLabel.setText(String.valueOf(currentUser.getReputation()));
+        // Admin users don't have reputation points
+        reputationLabel.setText(currentUser.isAdmin() ? "0" : String.valueOf(currentUser.getReputation()));
         
         // Set role badge
         if (roleBadge != null) {
