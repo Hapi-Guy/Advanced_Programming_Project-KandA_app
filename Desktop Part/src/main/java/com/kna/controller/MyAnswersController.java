@@ -20,7 +20,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -32,24 +31,19 @@ import javafx.scene.layout.VBox;
  */
 public class MyAnswersController {
     
-    @FXML private Button backButton;
-    
     // Stats
     @FXML private Label totalAnswersLabel;
-    @FXML private Label acceptedLabel;
-    @FXML private Label acceptanceRateLabel;
-    @FXML private Label coinsEarnedLabel;
-    @FXML private Label totalVotesLabel;
+    @FXML private Label acceptedAnswersLabel;
+    @FXML private Label pendingAnswersLabel;
+    @FXML private Label totalCoinsEarnedLabel;
     
     // Filter Buttons
-    @FXML private Button allBtn;
-    @FXML private Button acceptedBtn;
-    @FXML private Button topRatedBtn;
+    @FXML private Button allFilterBtn;
+    @FXML private Button acceptedFilterBtn;
+    @FXML private Button pendingFilterBtn;
     
     // Content Areas
-    @FXML private ScrollPane answersScrollPane;
-    @FXML private VBox answersList;
-    @FXML private StackPane emptyStatePane;
+    @FXML private VBox answersContainer;
     
     private AnswerDAO answerDAO;
     private QuestionDAO questionDAO;
@@ -65,6 +59,11 @@ public class MyAnswersController {
         answerDAO = new AnswerDAO();
         questionDAO = new QuestionDAO();
         currentUser = SessionManager.getInstance().getCurrentUser();
+        
+        // Set initial active filter tab
+        if (allFilterBtn != null) {
+            allFilterBtn.getStyleClass().add("active");
+        }
         
         if (currentUser != null) {
             loadAnswers();
@@ -96,48 +95,42 @@ public class MyAnswersController {
         
         int total = allAnswers.size();
         long accepted = allAnswers.stream().filter(Answer::isAccepted).count();
-        double acceptanceRate = total > 0 ? (accepted * 100.0 / total) : 0;
+        long pending = allAnswers.stream().filter(a -> !a.isAccepted()).count();
         int coinsEarned = allAnswers.stream()
             .filter(Answer::isAccepted)
             .mapToInt(Answer::getCoinsAwarded)
             .sum();
-        int totalVotes = allAnswers.stream()
-            .mapToInt(a -> a.getUpvotes() - a.getDownvotes())
-            .sum();
         
-        totalAnswersLabel.setText(String.valueOf(total));
-        acceptedLabel.setText(String.valueOf(accepted));
-        acceptanceRateLabel.setText(String.format("%.1f%%", acceptanceRate));
-        coinsEarnedLabel.setText(String.valueOf(coinsEarned));
-        totalVotesLabel.setText(String.valueOf(totalVotes));
+        if (totalAnswersLabel != null) totalAnswersLabel.setText(String.valueOf(total));
+        if (acceptedAnswersLabel != null) acceptedAnswersLabel.setText(String.valueOf(accepted));
+        if (pendingAnswersLabel != null) pendingAnswersLabel.setText(String.valueOf(pending));
+        if (totalCoinsEarnedLabel != null) totalCoinsEarnedLabel.setText(String.valueOf(coinsEarned));
     }
     
     /**
      * Display answers based on current filter.
      */
     private void displayAnswers(List<Answer> answers) {
-        answersList.getChildren().clear();
+        answersContainer.getChildren().clear();
         
         // Apply filter
         List<Answer> filteredAnswers = switch (currentFilter) {
             case "accepted" -> answers.stream().filter(Answer::isAccepted).toList();
-            case "topRated" -> answers.stream()
-                .filter(a -> a.getUpvotes() - a.getDownvotes() >= 5)
-                .sorted((a, b) -> Integer.compare(b.getUpvotes() - b.getDownvotes(), a.getUpvotes() - a.getDownvotes()))
-                .toList();
+            case "pending" -> answers.stream().filter(a -> !a.isAccepted()).toList();
             default -> answers;
         };
         
         if (filteredAnswers.isEmpty()) {
-            showEmptyState();
+            // Show empty message
+            Label emptyLabel = new Label("No answers found");
+            emptyLabel.getStyleClass().add("empty-message");
+            answersContainer.getChildren().add(emptyLabel);
             return;
         }
         
-        hideEmptyState();
-        
         for (Answer answer : filteredAnswers) {
             VBox answerCard = createAnswerCard(answer);
-            answersList.getChildren().add(answerCard);
+            answersContainer.getChildren().add(answerCard);
         }
     }
     
@@ -281,7 +274,7 @@ public class MyAnswersController {
      */
     private StackPane findDashboardContentArea() {
         try {
-            javafx.scene.Node node = answersList;
+            javafx.scene.Node node = answersContainer;
             while (node != null) {
                 if (node instanceof StackPane && node.getId() != null && node.getId().equals("contentArea")) {
                     return (StackPane) node;
@@ -298,9 +291,9 @@ public class MyAnswersController {
      * Filter: Show all answers.
      */
     @FXML
-    private void showAllAnswers() {
+    private void filterAll() {
         currentFilter = "all";
-        updateActiveTab(allBtn);
+        updateActiveFilter(allFilterBtn);
         displayAnswers(allAnswers);
     }
     
@@ -308,64 +301,30 @@ public class MyAnswersController {
      * Filter: Show accepted answers.
      */
     @FXML
-    private void showAcceptedAnswers() {
+    private void filterAccepted() {
         currentFilter = "accepted";
-        updateActiveTab(acceptedBtn);
+        updateActiveFilter(acceptedFilterBtn);
         displayAnswers(allAnswers);
     }
     
     /**
-     * Filter: Show top rated answers.
+     * Filter: Show pending answers.
      */
     @FXML
-    private void showTopRatedAnswers() {
-        currentFilter = "topRated";
-        updateActiveTab(topRatedBtn);
+    private void filterPending() {
+        currentFilter = "pending";
+        updateActiveFilter(pendingFilterBtn);
         displayAnswers(allAnswers);
     }
     
     /**
-     * Update active tab styling.
+     * Update active filter button styling.
      */
-    private void updateActiveTab(Button activeButton) {
-        allBtn.getStyleClass().remove("active-tab");
-        acceptedBtn.getStyleClass().remove("active-tab");
-        topRatedBtn.getStyleClass().remove("active-tab");
-        
-        activeButton.getStyleClass().add("active-tab");
-    }
-    
-    /**
-     * Navigate to browse questions.
-     */
-    @FXML
-    private void browseQuestions() {
-        try {
-            Main.switchScene("Dashboard.fxml", "KnA - Dashboard");
-        } catch (Exception e) {
-            e.printStackTrace();
-            showError("Failed to open Dashboard.");
-        }
-    }
-    
-    /**
-     * Show empty state.
-     */
-    private void showEmptyState() {
-        answersScrollPane.setManaged(false);
-        answersScrollPane.setVisible(false);
-        emptyStatePane.setManaged(true);
-        emptyStatePane.setVisible(true);
-    }
-    
-    /**
-     * Hide empty state.
-     */
-    private void hideEmptyState() {
-        answersScrollPane.setManaged(true);
-        answersScrollPane.setVisible(true);
-        emptyStatePane.setManaged(false);
-        emptyStatePane.setVisible(false);
+    private void updateActiveFilter(Button activeButton) {
+        if (allFilterBtn != null) allFilterBtn.getStyleClass().remove("active");
+        if (acceptedFilterBtn != null) acceptedFilterBtn.getStyleClass().remove("active");
+        if (pendingFilterBtn != null) pendingFilterBtn.getStyleClass().remove("active");
+        if (activeButton != null) activeButton.getStyleClass().add("active");
     }
     
     /**

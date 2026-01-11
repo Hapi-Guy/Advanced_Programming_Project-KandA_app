@@ -12,9 +12,7 @@ import com.kna.util.ToastNotification;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -26,36 +24,27 @@ import javafx.scene.layout.VBox;
  */
 public class LeaderboardController {
     
-    @FXML private Button backButton;
+    // Podium (Top 3) - Cards
+    @FXML private VBox firstPlaceCard;
+    @FXML private VBox secondPlaceCard;
+    @FXML private VBox thirdPlaceCard;
     
-    // Tab Buttons
-    @FXML private Button allTimeBtn;
-    @FXML private Button monthlyBtn;
-    @FXML private Button weeklyBtn;
-    
-    // Podium (Top 3)
-    @FXML private HBox podiumBox;
-    @FXML private VBox firstPlace;
-    @FXML private VBox secondPlace;
-    @FXML private VBox thirdPlace;
-    @FXML private Label firstAvatar;
-    @FXML private Label firstName;
-    @FXML private Label firstScore;
-    @FXML private Label secondAvatar;
-    @FXML private Label secondName;
-    @FXML private Label secondScore;
-    @FXML private Label thirdAvatar;
-    @FXML private Label thirdName;
-    @FXML private Label thirdScore;
+    // Podium Labels
+    @FXML private Label firstPlaceAvatar;
+    @FXML private Label firstPlaceName;
+    @FXML private Label firstPlaceScore;
+    @FXML private Label secondPlaceAvatar;
+    @FXML private Label secondPlaceName;
+    @FXML private Label secondPlaceScore;
+    @FXML private Label thirdPlaceAvatar;
+    @FXML private Label thirdPlaceName;
+    @FXML private Label thirdPlaceScore;
     
     // Rankings List
-    @FXML private ScrollPane leaderboardScrollPane;
     @FXML private VBox leaderboardList;
-    @FXML private StackPane emptyStatePane;
     
     private UserDAO userDAO;
     private User currentUser;
-    private String currentPeriod = "all";
     
     /**
      * Initialize the controller.
@@ -81,11 +70,13 @@ public class LeaderboardController {
             List<User> topUsers = userDAO.getTopUsersByReputation(50); // Get top 50
             
             if (topUsers.isEmpty()) {
-                showEmptyState();
+                // Show empty message in list
+                Label emptyLabel = new Label("No users found");
+                emptyLabel.getStyleClass().add("empty-message");
+                leaderboardList.getChildren().add(emptyLabel);
                 return;
             }
             
-            hideEmptyState();
             displayPodium(topUsers);
             displayRankings(topUsers);
             
@@ -99,50 +90,41 @@ public class LeaderboardController {
      * Display top 3 users in podium.
      */
     private void displayPodium(List<User> users) {
-        // Clear podium
-        clearPodium();
-        
         // First place
         if (users.size() >= 1) {
             User first = users.get(0);
-            firstAvatar.setText(getInitials(first.getName()));
-            firstName.setText(first.getName());
-            firstScore.setText(String.valueOf(first.getReputation()));
-            firstPlace.setVisible(true);
-            firstPlace.setManaged(true);
+            if (firstPlaceAvatar != null) firstPlaceAvatar.setText(getInitials(first.getName()));
+            if (firstPlaceName != null) firstPlaceName.setText(first.getName());
+            if (firstPlaceScore != null) firstPlaceScore.setText(String.valueOf(first.getReputation()));
+            if (firstPlaceCard != null) {
+                firstPlaceCard.setVisible(true);
+                firstPlaceCard.setManaged(true);
+            }
         }
         
         // Second place
         if (users.size() >= 2) {
             User second = users.get(1);
-            secondAvatar.setText(getInitials(second.getName()));
-            secondName.setText(second.getName());
-            secondScore.setText(String.valueOf(second.getReputation()));
-            secondPlace.setVisible(true);
-            secondPlace.setManaged(true);
+            if (secondPlaceAvatar != null) secondPlaceAvatar.setText(getInitials(second.getName()));
+            if (secondPlaceName != null) secondPlaceName.setText(second.getName());
+            if (secondPlaceScore != null) secondPlaceScore.setText(String.valueOf(second.getReputation()));
+            if (secondPlaceCard != null) {
+                secondPlaceCard.setVisible(true);
+                secondPlaceCard.setManaged(true);
+            }
         }
         
         // Third place
         if (users.size() >= 3) {
             User third = users.get(2);
-            thirdAvatar.setText(getInitials(third.getName()));
-            thirdName.setText(third.getName());
-            thirdScore.setText(String.valueOf(third.getReputation()));
-            thirdPlace.setVisible(true);
-            thirdPlace.setManaged(true);
+            if (thirdPlaceAvatar != null) thirdPlaceAvatar.setText(getInitials(third.getName()));
+            if (thirdPlaceName != null) thirdPlaceName.setText(third.getName());
+            if (thirdPlaceScore != null) thirdPlaceScore.setText(String.valueOf(third.getReputation()));
+            if (thirdPlaceCard != null) {
+                thirdPlaceCard.setVisible(true);
+                thirdPlaceCard.setManaged(true);
+            }
         }
-    }
-    
-    /**
-     * Clear podium display.
-     */
-    private void clearPodium() {
-        firstPlace.setVisible(false);
-        firstPlace.setManaged(false);
-        secondPlace.setVisible(false);
-        secondPlace.setManaged(false);
-        thirdPlace.setVisible(false);
-        thirdPlace.setManaged(false);
     }
     
     /**
@@ -244,73 +226,6 @@ public class LeaderboardController {
     }
     
     /**
-     * Show all time leaderboard.
-     */
-    @FXML
-    private void showAllTime() {
-        currentPeriod = "all";
-        updateActiveTab(allTimeBtn);
-        loadLeaderboard();
-    }
-    
-    /**
-     * Show monthly leaderboard.
-     */
-    @FXML
-    private void showMonthly() {
-        currentPeriod = "monthly";
-        updateActiveTab(monthlyBtn);
-        showInfo("Monthly leaderboard coming soon!");
-        // TODO: Implement monthly filtering based on created_at timestamps
-    }
-    
-    /**
-     * Show weekly leaderboard.
-     */
-    @FXML
-    private void showWeekly() {
-        currentPeriod = "weekly";
-        updateActiveTab(weeklyBtn);
-        showInfo("Weekly leaderboard coming soon!");
-        // TODO: Implement weekly filtering based on created_at timestamps
-    }
-    
-    /**
-     * Update active tab styling.
-     */
-    private void updateActiveTab(Button activeButton) {
-        allTimeBtn.getStyleClass().remove("active-tab");
-        monthlyBtn.getStyleClass().remove("active-tab");
-        weeklyBtn.getStyleClass().remove("active-tab");
-        
-        activeButton.getStyleClass().add("active-tab");
-    }
-    
-    /**
-     * Show empty state.
-     */
-    private void showEmptyState() {
-        podiumBox.setManaged(false);
-        podiumBox.setVisible(false);
-        leaderboardScrollPane.setManaged(false);
-        leaderboardScrollPane.setVisible(false);
-        emptyStatePane.setManaged(true);
-        emptyStatePane.setVisible(true);
-    }
-    
-    /**
-     * Hide empty state.
-     */
-    private void hideEmptyState() {
-        podiumBox.setManaged(true);
-        podiumBox.setVisible(true);
-        leaderboardScrollPane.setManaged(true);
-        leaderboardScrollPane.setVisible(true);
-        emptyStatePane.setManaged(false);
-        emptyStatePane.setVisible(false);
-    }
-    
-    /**
      * Navigate back to dashboard.
      */
     @FXML
@@ -333,13 +248,6 @@ public class LeaderboardController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    /**
-     * Show info toast notification.
-     */
-    private void showInfo(String message) {
-        ToastNotification.show(message, ToastNotification.NotificationType.INFO);
     }
     
     /**

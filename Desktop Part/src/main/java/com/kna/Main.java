@@ -54,6 +54,14 @@ public class Main extends Application {
      */
     public static void switchScene(String fxmlPath, String title) {
         try {
+            // Normalize the path - ensure it starts with /fxml/
+            String normalizedPath = fxmlPath;
+            if (!fxmlPath.startsWith("/")) {
+                normalizedPath = "/fxml/" + fxmlPath;
+            } else if (!fxmlPath.startsWith("/fxml/")) {
+                normalizedPath = "/fxml" + fxmlPath;
+            }
+            
             // Save current window state BEFORE changing scene
             boolean wasMaximized = primaryStage.isMaximized();
             boolean wasFullScreen = primaryStage.isFullScreen();
@@ -62,7 +70,7 @@ public class Main extends Application {
             double currentX = primaryStage.getX();
             double currentY = primaryStage.getY();
             
-            Parent root = FXMLLoader.load(Main.class.getResource(fxmlPath));
+            Parent root = FXMLLoader.load(Main.class.getResource(normalizedPath));
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Main.class.getResource("/css/application.css").toExternalForm());
             

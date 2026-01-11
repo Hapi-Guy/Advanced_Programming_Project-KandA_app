@@ -1,17 +1,24 @@
 package com.kna.controller;
 
+import java.math.BigDecimal;
+
 import com.kna.model.User;
 import com.kna.service.AuthService;
 import com.kna.service.CoinService;
 import com.kna.util.SessionManager;
-import com.kna.util.ToastNotification;
+
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -23,16 +30,20 @@ import javafx.util.Duration;
 public class CoinPurchaseController {
     
     @FXML private Label currentBalanceLabel;
-    @FXML private GridPane packagesGrid;
-    @FXML private VBox selectedPackageInfo;
-    @FXML private Label selectedPackageNameLabel;
+    @FXML private HBox packagesContainer;
+    @FXML private VBox purchaseSummary;
+    @FXML private Label selectedPackageLabel;
     @FXML private Label selectedCoinsLabel;
     @FXML private Label selectedPriceLabel;
+    @FXML private Button confirmPurchaseButton;
+    @FXML private Label statusLabel;
     
     private final CoinService coinService;
     private final AuthService authService;
     private User currentUser;
-    private CoinService.CoinPackage selectedPackage;
+    private String selectedPackageName;
+    private int selectedCoins;
+    private String selectedPrice;
 
     public CoinPurchaseController() {
         this.coinService = new CoinService();
@@ -43,88 +54,105 @@ public class CoinPurchaseController {
     private void initialize() {
         currentUser = SessionManager.getInstance().getCurrentUser();
         
-
+        if (currentBalanceLabel != null && currentUser != null) {
+            currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
+        }
         
-        currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
-        
-        loadCoinPackages();
+        // Hide purchase summary initially
+        if (purchaseSummary != null) {
+            purchaseSummary.setVisible(false);
+            purchaseSummary.setManaged(false);
+        }
     }
-
-    private void loadCoinPackages() {
-        CoinService.CoinPackage[] packages = coinService.getPackages();
-        
-        int col = 0;
-        int row = 0;
-        
-        for (CoinService.CoinPackage pkg : packages) {
-            VBox packageCard = createPackageCard(pkg);
-            packagesGrid.add(packageCard, col, row);
-            
-            col++;
-            if (col > 2) {
-                col = 0;
-                row++;
+    
+    /**
+     * Select starter package.
+     */
+    @FXML
+    private void selectStarterPackage() {
+        selectPackageDetails("Starter", 50, "$4.99");
+    }
+    
+    /**
+     * Select value package.
+     */
+    @FXML
+    private void selectValuePackage() {
+        selectPackageDetails("Value Pack", 150, "$9.99");
+    }
+    
+    /**
+     * Select premium package.
+     */
+    @FXML
+    private void selectPremiumPackage() {
+        selectPackageDetails("Premium", 400, "$19.99");
+    }
+    
+    /**
+     * Select ultimate package.
+     */
+    @FXML
+    private void selectUltimatePackage() {
+        selectPackageDetails("Ultimate", 1000, "$39.99");
+    }
+    
+    /**
+     * Select a package from clicking on the card.
+     */
+    @FXML
+    private void selectPackage(javafx.scene.input.MouseEvent event) {
+        if (event.getSource() instanceof javafx.scene.layout.VBox card) {
+            String userData = (String) card.getUserData();
+            switch (userData) {
+                case "starter" -> selectStarterPackage();
+                case "popular" -> selectValuePackage();
+                case "premium" -> selectPremiumPackage();
+                case "ultimate" -> selectUltimatePackage();
             }
         }
     }
-
-    private VBox createPackageCard(CoinService.CoinPackage pkg) {
-        VBox card = new VBox(15);
-        card.getStyleClass().add("card");
-        card.setAlignment(Pos.CENTER);
-        card.setPrefWidth(220);
-        card.setPrefHeight(200);
-        card.setStyle(card.getStyle() + "-fx-cursor: hand;");
+    
+    private void selectPackageDetails(String name, int coins, String price) {
+        selectedPackageName = name;
+        selectedCoins = coins;
+        selectedPrice = price;
         
-        // Package name
-        Label nameLabel = new Label(pkg.name);
-        nameLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: bold;");
+        if (selectedPackageLabel != null) selectedPackageLabel.setText(name);
+        if (selectedCoinsLabel != null) selectedCoinsLabel.setText(coins + " Coins");
+        if (selectedPriceLabel != null) selectedPriceLabel.setText(price);
         
-        // Coin amount
-        Label coinsLabel = new Label( pkg.coins + " Coins");
-        coinsLabel.setStyle("-fx-font-size: 16px; -fx-background-color: #FFF3E0; -fx-text-fill: #E65100; -fx-padding: 8px 15px; -fx-background-radius: 15px;");
-        
-        // Price
-        Label priceLabel = new Label("" + pkg.price);
-        priceLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #2196F3;");
-        
-        // Select button
-        Button selectButton = new Button("Select");
-        selectButton.setOnAction(e -> selectPackage(pkg));
-        
-        card.getChildren().addAll(nameLabel, coinsLabel, priceLabel, selectButton);
-        
-        card.setOnMouseEntered(e -> card.setStyle(card.getStyle() + "-fx-background-color: #E3F2FD;"));
-        card.setOnMouseExited(e -> card.setStyle(card.getStyle() + "-fx-background-color: white;"));
-        card.setOnMouseClicked(e -> selectPackage(pkg));
-        
-        return card;
+        if (purchaseSummary != null) {
+            purchaseSummary.setVisible(true);
+            purchaseSummary.setManaged(true);
+        }
     }
 
-    private void selectPackage(CoinService.CoinPackage pkg) {
-        selectedPackage = pkg;
-        
-        selectedPackageNameLabel.setText(pkg.name);
-        selectedCoinsLabel.setText(pkg.coins + " Coins");
-        selectedPriceLabel.setText("৳ " + pkg.price + " BDT");
-        
-        selectedPackageInfo.setVisible(true);
-    }
-
+    /**
+     * Confirm purchase action.
+     */
     @FXML
-    private void handlePurchase() {
-
+    private void confirmPurchase() {
+        if (selectedPackageName == null) {
+            if (statusLabel != null) {
+                statusLabel.setText("Please select a package first.");
+                statusLabel.setStyle("-fx-text-fill: #f44336;");
+            }
+            return;
+        }
         
         // Show confirmation dialog
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Confirm Purchase");
-        confirmAlert.setHeaderText("Purchase " + selectedPackage.coins + " Coins?");
-        confirmAlert.setContentText("You will be charged ৳" + selectedPackage.price + " BDT.");
+        confirmAlert.setHeaderText("Purchase " + selectedCoins + " Coins?");
+        confirmAlert.setContentText("You will be charged " + selectedPrice + ".");
         
         if (confirmAlert.showAndWait().get() != ButtonType.OK) {
             return;
         }
-
+        
+        // Process the purchase
+        simulatePayment();
     }
 
     private void simulatePayment() {
@@ -162,32 +190,45 @@ public class CoinPurchaseController {
     private void completePurchase() {
         try {
             // Process purchase
-            coinService.purchaseCoins(selectedPackage.coins, selectedPackage.price);
+            coinService.purchaseCoins(selectedCoins, new BigDecimal(selectedPrice.replace("$", "")));
             
             // Update UI
             currentUser = SessionManager.getInstance().getCurrentUser();
-            currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
+            if (currentBalanceLabel != null) {
+                currentBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
+            }
             
-//            // Show success
-//            ToastNotification.showSuccess("Purchase successful! You now have " +
-//                                        currentUser.getCoins() + " Coins");
+            // Show success
+            if (statusLabel != null) {
+                statusLabel.setText("✓ Purchase successful! You now have " + currentUser.getCoins() + " coins.");
+                statusLabel.setStyle("-fx-text-fill: #4CAF50;");
+            }
             
             // Reset selection
-            selectedPackageInfo.setVisible(false);
-            selectedPackage = null;
+            if (purchaseSummary != null) {
+                purchaseSummary.setVisible(false);
+                purchaseSummary.setManaged(false);
+            }
+            selectedPackageName = null;
             
             // Refresh user data
             authService.refreshCurrentUser();
             
         } catch (Exception e) {
-            ToastNotification.showError("Purchase failed: " + e.getMessage());
+            if (statusLabel != null) {
+                statusLabel.setText("✗ Purchase failed: " + e.getMessage());
+                statusLabel.setStyle("-fx-text-fill: #f44336;");
+            }
             e.printStackTrace();
         }
     }
 
     @FXML
     private void handleCancel() {
-        selectedPackageInfo.setVisible(false);
-        selectedPackage = null;
+        if (purchaseSummary != null) {
+            purchaseSummary.setVisible(false);
+            purchaseSummary.setManaged(false);
+        }
+        selectedPackageName = null;
     }
 }

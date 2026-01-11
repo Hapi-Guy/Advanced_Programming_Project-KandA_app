@@ -17,9 +17,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -31,21 +29,20 @@ import javafx.scene.layout.VBox;
  */
 public class MyQuestionsController {
     
-    @FXML private Button backButton;
-    
     // Stats
     @FXML private Label totalQuestionsLabel;
-    @FXML private Label answeredLabel;
-    @FXML private Label unevaluatedLabel;
-    @FXML private Label coinsSpentLabel;
+    @FXML private Label answeredQuestionsLabel;
+    @FXML private Label pendingQuestionsLabel;
+    @FXML private Label totalCoinsSpentLabel;
     
-    // Filter ComboBox
-    @FXML private ComboBox<String> filterComboBox;
+    // Filter Buttons
+    @FXML private Button allFilterBtn;
+    @FXML private Button answeredFilterBtn;
+    @FXML private Button pendingFilterBtn;
+    @FXML private Button urgentFilterBtn;
     
     // Content Areas
-    @FXML private ScrollPane questionsScrollPane;
-    @FXML private VBox questionsList;
-    @FXML private StackPane emptyStatePane;
+    @FXML private VBox questionsContainer;
     
     private QuestionDAO questionDAO;
     private User currentUser;
@@ -60,9 +57,10 @@ public class MyQuestionsController {
         questionDAO = new QuestionDAO();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
-        // Initialize filter dropdown
-        filterComboBox.getItems().addAll("All", "Answered", "Unanswered", "Urgent");
-        filterComboBox.setValue("All");
+        // Set initial active filter tab
+        if (allFilterBtn != null) {
+            allFilterBtn.getStyleClass().add("active");
+        }
         
         if (currentUser != null) {
             loadQuestions();
@@ -94,41 +92,42 @@ public class MyQuestionsController {
         
         int total = allQuestions.size();
         long answered = allQuestions.stream().filter(Question::isAnswered).count();
-        long unevaluated = allQuestions.stream().filter(q -> !q.isEvaluated()).count();
+        long pending = allQuestions.stream().filter(q -> !q.isAnswered()).count();
         int coinsSpent = allQuestions.stream()
             .mapToInt(q -> q.isUrgent() ? 30 : 20)
             .sum();
         
-        totalQuestionsLabel.setText(String.valueOf(total));
-        answeredLabel.setText(String.valueOf(answered));
-        unevaluatedLabel.setText(String.valueOf(unevaluated));
-        coinsSpentLabel.setText(String.valueOf(coinsSpent));
+        if (totalQuestionsLabel != null) totalQuestionsLabel.setText(String.valueOf(total));
+        if (answeredQuestionsLabel != null) answeredQuestionsLabel.setText(String.valueOf(answered));
+        if (pendingQuestionsLabel != null) pendingQuestionsLabel.setText(String.valueOf(pending));
+        if (totalCoinsSpentLabel != null) totalCoinsSpentLabel.setText(String.valueOf(coinsSpent));
     }
     
     /**
      * Display questions based on current filter.
      */
     private void displayQuestions(List<Question> questions) {
-        questionsList.getChildren().clear();
+        questionsContainer.getChildren().clear();
         
         // Apply filter
         List<Question> filteredQuestions = switch (currentFilter) {
             case "answered" -> questions.stream().filter(Question::isAnswered).toList();
-            case "unanswered" -> questions.stream().filter(q -> !q.isAnswered()).toList();
+            case "pending" -> questions.stream().filter(q -> !q.isAnswered()).toList();
             case "urgent" -> questions.stream().filter(Question::isUrgent).toList();
             default -> questions;
         };
         
         if (filteredQuestions.isEmpty()) {
-            showEmptyState();
+            // Show empty message
+            Label emptyLabel = new Label("No questions found");
+            emptyLabel.getStyleClass().add("empty-message");
+            questionsContainer.getChildren().add(emptyLabel);
             return;
         }
         
-        hideEmptyState();
-        
         for (Question question : filteredQuestions) {
             VBox questionCard = createQuestionCard(question);
-            questionsList.getChildren().add(questionCard);
+            questionsContainer.getChildren().add(questionCard);
         }
     }
     
@@ -259,7 +258,7 @@ public class MyQuestionsController {
      */
     private StackPane findDashboardContentArea() {
         try {
-            javafx.scene.Node node = questionsList;
+            javafx.scene.Node node = questionsContainer;
             while (node != null) {
                 if (node instanceof StackPane && node.getId() != null && node.getId().equals("contentArea")) {
                     return (StackPane) node;
@@ -273,21 +272,54 @@ public class MyQuestionsController {
     }
     
     /**
-     * Apply filter based on ComboBox selection.
+     * Filter: Show all questions.
      */
     @FXML
-    private void applyFilter() {
-        String selectedFilter = filterComboBox.getValue();
-        if (selectedFilter == null) return;
-        
-        switch (selectedFilter) {
-            case "All" -> currentFilter = "all";
-            case "Answered" -> currentFilter = "answered";
-            case "Unanswered" -> currentFilter = "unanswered";
-            case "Urgent" -> currentFilter = "urgent";
-        }
-        
+    private void filterAll() {
+        currentFilter = "all";
+        updateActiveFilter(allFilterBtn);
         displayQuestions(allQuestions);
+    }
+    
+    /**
+     * Filter: Show answered questions.
+     */
+    @FXML
+    private void filterAnswered() {
+        currentFilter = "answered";
+        updateActiveFilter(answeredFilterBtn);
+        displayQuestions(allQuestions);
+    }
+    
+    /**
+     * Filter: Show pending questions.
+     */
+    @FXML
+    private void filterPending() {
+        currentFilter = "pending";
+        updateActiveFilter(pendingFilterBtn);
+        displayQuestions(allQuestions);
+    }
+    
+    /**
+     * Filter: Show urgent questions.
+     */
+    @FXML
+    private void filterUrgent() {
+        currentFilter = "urgent";
+        updateActiveFilter(urgentFilterBtn);
+        displayQuestions(allQuestions);
+    }
+    
+    /**
+     * Update active filter button styling.
+     */
+    private void updateActiveFilter(Button activeButton) {
+        if (allFilterBtn != null) allFilterBtn.getStyleClass().remove("active");
+        if (answeredFilterBtn != null) answeredFilterBtn.getStyleClass().remove("active");
+        if (pendingFilterBtn != null) pendingFilterBtn.getStyleClass().remove("active");
+        if (urgentFilterBtn != null) urgentFilterBtn.getStyleClass().remove("active");
+        if (activeButton != null) activeButton.getStyleClass().add("active");
     }
     
     /**
@@ -301,26 +333,6 @@ public class MyQuestionsController {
             e.printStackTrace();
             showError("Failed to open Ask Question page.");
         }
-    }
-    
-    /**
-     * Show empty state.
-     */
-    private void showEmptyState() {
-        questionsScrollPane.setManaged(false);
-        questionsScrollPane.setVisible(false);
-        emptyStatePane.setManaged(true);
-        emptyStatePane.setVisible(true);
-    }
-    
-    /**
-     * Hide empty state.
-     */
-    private void hideEmptyState() {
-        questionsScrollPane.setManaged(true);
-        questionsScrollPane.setVisible(true);
-        emptyStatePane.setManaged(false);
-        emptyStatePane.setVisible(false);
     }
     
     /**

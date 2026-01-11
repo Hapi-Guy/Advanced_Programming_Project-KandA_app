@@ -1,7 +1,5 @@
 package com.kna.controller;
 
-import java.io.File;
-
 import com.kna.Main;
 import com.kna.model.Question;
 import com.kna.model.User;
@@ -10,17 +8,11 @@ import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.stage.FileChooser;
 
 /**
  * Controller for the Ask Question page.
@@ -28,30 +20,25 @@ import javafx.stage.FileChooser;
  */
 public class AskQuestionController {
     
-    @FXML private Button backButton;
-    @FXML private Label coinsLabel;
-    
-    // Warning Box
-    @FXML private HBox warningBox;
-    @FXML private Label warningLabel;
-    @FXML private Label warningSubLabel;
+    @FXML private Label coinBalanceLabel;
+    @FXML private Label errorLabel;
     
     // Form Fields
     @FXML private TextField titleField;
     @FXML private TextArea descriptionArea;
-    @FXML private ComboBox<String> categoryCombo;
+    @FXML private ComboBox<String> categoryComboBox;
     @FXML private CheckBox urgentCheckbox;
-    @FXML private Label costLabel;
-    @FXML private Label imageFileLabel;
-    @FXML private StackPane imagePreviewPane;
-    @FXML private ImageView imagePreview;
+    @FXML private javafx.scene.control.Slider rewardSlider;
+    @FXML private Label rewardLabel;
+    
+    // Cost summary labels
+    @FXML private Label baseRewardSummary;
+    @FXML private Label urgentFeeSummary;
+    @FXML private Label totalCostLabel;
     
     private QuestionService questionService;
     private User currentUser;
-    private File selectedImageFile;
-    
-    private static final int BASE_COST = 20;
-    private static final int URGENT_COST = 30;
+    private int currentReward = 5;
     
     /**
      * Initialize the controller.
@@ -62,14 +49,32 @@ public class AskQuestionController {
         currentUser = SessionManager.getInstance().getCurrentUser();
         
         // Populate category ComboBox
-        categoryCombo.getItems().addAll(
-            "CSE", "EEE", "CE", "ME", "IPE", "TE", "NAME", "Arch", "URP", 
-            "BME", "MSE", "GCE", "WRE", "BECM", "General"
+        categoryComboBox.getItems().addAll(
+            "CSE", "EEE", "ECE", "MTE", "CE", "ME", "IEM", "TE", "Arch", "URP", 
+            "BME", "MSE", "LE", "ESE", "BECM", "ChE", "MATH", "HUM", "PHY", "CHEM", "General"
         );
+        
+        // Setup reward slider listener
+        if (rewardSlider != null) {
+            rewardSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                currentReward = newVal.intValue();
+                if (rewardLabel != null) {
+                    rewardLabel.setText(String.valueOf(currentReward));
+                }
+                updateCostSummary();
+            });
+        }
+        
+        // Setup urgent checkbox listener
+        if (urgentCheckbox != null) {
+            urgentCheckbox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+                updateCostSummary();
+            });
+        }
         
         if (currentUser != null) {
             loadUserData();
-            checkUnevaluatedQuestions();
+            updateCostSummary();
         } else {
             showError("Session expired. Please login again.");
             goToLogin();
@@ -80,173 +85,126 @@ public class AskQuestionController {
      * Load user's current coin balance.
      */
     private void loadUserData() {
-        coinsLabel.setText(String.valueOf(currentUser.getCoins()));
-    }
-    
-    /**
-     * Check if user has too many unevaluated questions.
-     */
-    private void checkUnevaluatedQuestions() {
-        try {
-            boolean canAsk = questionService.canAskQuestion(currentUser.getId());
-            
-            if (!canAsk) {
-                int unevaluatedCount = questionService.getUnevaluatedCount(currentUser.getId());
-                warningBox.setManaged(true);
-                warningBox.setVisible(true);
-                warningLabel.setText("You have " + unevaluatedCount + " unevaluated questions!");
-                warningSubLabel.setText("Please evaluate answered questions before posting new ones. Maximum allowed: 5 unevaluated questions.");
-                
-                // Disable form
-                titleField.setDisable(true);
-                descriptionArea.setDisable(true);
-                categoryCombo.setDisable(true);
-                urgentCheckbox.setDisable(true);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (coinBalanceLabel != null) {
+            coinBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
         }
     }
     
     /**
-     * Update the cost display when urgent checkbox is toggled.
+     * Update the cost summary display.
      */
-    @FXML
-    private void updateCostDisplay() {
-        int cost = urgentCheckbox.isSelected() ? URGENT_COST : BASE_COST;
-        costLabel.setText(String.valueOf(cost));
-    }
-    
-    /**
-     * Choose an image file to attach to the question.
-     */
-    @FXML
-    private void chooseImage() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select Question Image");
-        fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
-        );
+    private void updateCostSummary() {
+        int baseReward = currentReward;
+        int urgentFee = (urgentCheckbox != null && urgentCheckbox.isSelected()) ? 5 : 0;
+        int total = baseReward + urgentFee;
         
-        File file = fileChooser.showOpenDialog(backButton.getScene().getWindow());
-        
-        if (file != null) {
-            selectedImageFile = file;
-            imageFileLabel.setText(file.getName());
-            
-            // Show preview
-            try {
-                Image image = new Image(file.toURI().toString());
-                imagePreview.setImage(image);
-                imagePreviewPane.setManaged(true);
-                imagePreviewPane.setVisible(true);
-            } catch (Exception e) {
-                showError("Failed to load image preview.");
-                e.printStackTrace();
-            }
-        }
+        if (baseRewardSummary != null) baseRewardSummary.setText(baseReward + " coins");
+        if (urgentFeeSummary != null) urgentFeeSummary.setText(urgentFee + " coins");
+        if (totalCostLabel != null) totalCostLabel.setText(total + " coins");
     }
     
     /**
      * Submit the question to the database.
      */
     @FXML
-    private void submitQuestion() {
+    private void handleSubmit() {
         // Validate inputs
         String title = titleField.getText().trim();
         String description = descriptionArea.getText().trim();
-        String category = categoryCombo.getValue();
-        boolean isUrgent = urgentCheckbox.isSelected();
+        String category = categoryComboBox.getValue();
+        boolean isUrgent = urgentCheckbox != null && urgentCheckbox.isSelected();
+        
+        // Clear previous error
+        if (errorLabel != null) {
+            errorLabel.setText("");
+        }
         
         if (title.isEmpty()) {
-            showError("Please enter a question title.");
+            showFormError("Please enter a question title.");
             return;
         }
         
         if (title.length() < 10) {
-            showError("Title must be at least 10 characters long.");
+            showFormError("Title must be at least 10 characters long.");
             return;
         }
         
         if (description.isEmpty()) {
-            showError("Please provide a detailed description.");
+            showFormError("Please provide a detailed description.");
             return;
         }
         
         if (description.length() < 20) {
-            showError("Description must be at least 20 characters long.");
+            showFormError("Description must be at least 20 characters long.");
             return;
         }
         
         if (category == null || category.isEmpty()) {
-            showError("Please select a category.");
+            showFormError("Please select a category.");
             return;
         }
         
-        // Check if user can ask question
+        // Calculate cost
+        int urgentFee = isUrgent ? 5 : 0;
+        int totalCost = currentReward + urgentFee;
+        
+        // Check if user has enough coins
+        if (currentUser.getCoins() < totalCost) {
+            showFormError("Insufficient coins! You need " + totalCost + " coins to post this question.");
+            return;
+        }
+        
         try {
-            if (!questionService.canAskQuestion(currentUser.getId())) {
-                showError("You have too many unevaluated questions. Please evaluate answered questions first.");
-                return;
-            }
-            
-            // Check if user has enough coins
-            int cost = isUrgent ? URGENT_COST : BASE_COST;
-            if (currentUser.getCoins() < cost) {
-                showError("Insufficient coins! You need " + cost + " coins to post this question.");
-                return;
-            }
-            
-            // Post question using QuestionService (it handles image saving internally)
+            // Post question using QuestionService
             Question question = questionService.askQuestion(
                 title,
                 description,
                 category,
                 isUrgent,
-                selectedImageFile
+                null // No image file in simplified form
             );
             
             if (question != null && question.getQuestionId() > 0) {
                 // Update current user's coin balance
-                currentUser = SessionManager.getInstance().getCurrentUser(); // Refresh from session
+                currentUser = SessionManager.getInstance().getCurrentUser();
                 
-                showSuccess("Question posted successfully! " + cost + " coins deducted.");
+                showSuccess("Question posted successfully! " + totalCost + " coins deducted.");
                 
                 // Clear all fields after successful submission
                 clearAllFields();
             } else {
-                showError("Failed to post question. Please try again.");
+                showFormError("Failed to post question. Please try again.");
             }
             
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Error: " + e.getMessage());
+            showFormError("Error: " + e.getMessage());
         }
+    }
+    
+    /**
+     * Show error in the form error label.
+     */
+    private void showFormError(String message) {
+        if (errorLabel != null) {
+            errorLabel.setText(message);
+            errorLabel.setStyle("-fx-text-fill: #f44336;");
+        }
+        showError(message);
     }
     
     /**
      * Clear all form fields.
      */
-    @FXML
     private void clearAllFields() {
         titleField.clear();
         descriptionArea.clear();
-        categoryCombo.setValue(null);
-        urgentCheckbox.setSelected(false);
-        selectedImageFile = null;
-        imageFileLabel.setText("No file chosen");
-        imagePreviewPane.setManaged(false);
-        imagePreviewPane.setVisible(false);
-        imagePreview.setImage(null);
-        updateCostDisplay();
-    }
-    
-    /**
-     * Cancel button - clear all fields.
-     */
-    @FXML
-    private void handleCancel() {
-        clearAllFields();
+        categoryComboBox.setValue(null);
+        if (urgentCheckbox != null) urgentCheckbox.setSelected(false);
+        if (rewardSlider != null) rewardSlider.setValue(5);
+        currentReward = 5;
+        updateCostSummary();
+        if (errorLabel != null) errorLabel.setText("");
     }
     
     /**

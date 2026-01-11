@@ -134,8 +134,14 @@
                                     <Label text="Category:" styleClass="filter-label"/>
                                     <ComboBox fx:id="categoryFilter" onAction="#applyFilters" prefWidth="180" styleClass="combo-box"/>
                                 </HBox>
-                                <CheckBox fx:id="urgentOnlyCheckbox" onAction="#applyFilters" text="Urgent Only" styleClass="check-box"/>
-                                <CheckBox fx:id="unansweredOnlyCheckbox" onAction="#applyFilters" text="Unanswered Only" styleClass="check-box"/>
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <CheckBox fx:id="urgentOnlyCheckbox" onAction="#applyFilters" styleClass="check-box"/>
+                                    <Label text="🔥 Show Urgent Questions Only" style="-fx-font-size: 13px;"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <CheckBox fx:id="unansweredOnlyCheckbox" onAction="#applyFilters" styleClass="check-box"/>
+                                    <Label text="❓ Show Unanswered Questions Only" style="-fx-font-size: 13px;"/>
+                                </HBox>
                             </HBox>
                         </VBox>
 

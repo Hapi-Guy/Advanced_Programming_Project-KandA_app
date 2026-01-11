@@ -40,7 +40,7 @@
                 
                 <HBox fx:id="packagesContainer" spacing="20" alignment="CENTER">
                     <!-- Starter Package -->
-                    <VBox alignment="CENTER" spacing="15" styleClass="package-card" onMouseClicked="#selectPackage" userData="starter">
+                    <VBox alignment="CENTER" spacing="15" styleClass="package-card">
                         <Label text="🌟" style="-fx-font-size: 32px;"/>
                         <Label text="Starter" styleClass="package-name"/>
                         <Label text="50 Coins" styleClass="package-coins"/>
@@ -49,7 +49,7 @@
                     </VBox>
                     
                     <!-- Popular Package -->
-                    <VBox alignment="CENTER" spacing="15" styleClass="package-card" style="-fx-border-color: #2196F3; -fx-border-width: 2px;" onMouseClicked="#selectPackage" userData="popular">
+                    <VBox alignment="CENTER" spacing="15" styleClass="package-card" style="-fx-border-color: #2196F3; -fx-border-width: 2px;">
                         <Label text="🔥 POPULAR" style="-fx-font-size: 11px; -fx-text-fill: #2196F3; -fx-font-weight: bold;"/>
                         <Label text="⭐" style="-fx-font-size: 32px;"/>
                         <Label text="Value Pack" styleClass="package-name"/>
@@ -59,7 +59,7 @@
                     </VBox>
                     
                     <!-- Premium Package -->
-                    <VBox alignment="CENTER" spacing="15" styleClass="package-card" onMouseClicked="#selectPackage" userData="premium">
+                    <VBox alignment="CENTER" spacing="15" styleClass="package-card">
                         <Label text="💎" style="-fx-font-size: 32px;"/>
                         <Label text="Premium" styleClass="package-name"/>
                         <Label text="400 Coins" styleClass="package-coins"/>
@@ -68,7 +68,7 @@
                     </VBox>
                     
                     <!-- Ultimate Package -->
-                    <VBox alignment="CENTER" spacing="15" styleClass="package-card" onMouseClicked="#selectPackage" userData="ultimate">
+                    <VBox alignment="CENTER" spacing="15" styleClass="package-card">
                         <Label text="👑" style="-fx-font-size: 32px;"/>
                         <Label text="Ultimate" styleClass="package-name"/>
                         <Label text="1000 Coins" styleClass="package-coins"/>

@@ -18,8 +18,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -31,27 +29,14 @@ import javafx.scene.layout.VBox;
  */
 public class SearchResultsController {
     
-    @FXML private Button backButton;
-    @FXML private TextField searchField;
-    @FXML private Label resultsCountLabel;
-    
-    // Filter Tabs
-    @FXML private Button allTabBtn;
-    @FXML private Button questionsTabBtn;
-    @FXML private Button usersTabBtn;
-    
-    // Content Areas
-    @FXML private ScrollPane resultsScrollPane;
-    @FXML private VBox resultsList;
-    @FXML private StackPane emptyStatePane;
-    @FXML private StackPane initialStatePane;
-    @FXML private Label emptyStateTitle;
-    @FXML private Label emptyStateSubtitle;
+    @FXML private Label searchQueryLabel;
+    @FXML private Label resultCountLabel;
+    @FXML private VBox resultsContainer;
+    @FXML private VBox emptyState;
     
     private QuestionDAO questionDAO;
     private UserDAO userDAO;
     private User currentUser;
-    private String currentFilter = "all";
     private List<Question> foundQuestions = new ArrayList<>();
     private List<User> foundUsers = new ArrayList<>();
     
@@ -73,29 +58,19 @@ public class SearchResultsController {
         // Get search query from session if navigated from dashboard
         String searchQuery = (String) SessionManager.getInstance().getAttribute("searchQuery");
         if (searchQuery != null && !searchQuery.isEmpty()) {
-            searchField.setText(searchQuery);
-            performSearch();
+            if (searchQueryLabel != null) {
+                searchQueryLabel.setText("Results for: \"" + searchQuery + "\"");
+            }
+            performSearch(searchQuery);
             SessionManager.getInstance().removeAttribute("searchQuery");
         }
-        
-        // Enter key handler
-        searchField.setOnAction(e -> performSearch());
     }
     
     /**
      * Perform search based on input.
      */
-    @FXML
-    private void performSearch() {
-        String query = searchField.getText().trim();
-        
-        if (query.isEmpty()) {
-            showWarning("Please enter a search query.");
-            return;
-        }
-        
-        if (query.length() < 2) {
-            showWarning("Search query must be at least 2 characters.");
+    private void performSearch(String query) {
+        if (query == null || query.trim().isEmpty()) {
             return;
         }
         
@@ -119,37 +94,28 @@ public class SearchResultsController {
      * Display search results based on current filter.
      */
     private void displayResults() {
-        resultsList.getChildren().clear();
-        hideInitialState();
+        resultsContainer.getChildren().clear();
         
         int totalResults = foundQuestions.size() + foundUsers.size();
         
         if (totalResults == 0) {
-            showEmptyState("No results found", "Try different keywords or check your spelling");
-            resultsCountLabel.setText("Found 0 results");
+            showEmptyState();
+            resultCountLabel.setText("0 results");
             return;
         }
         
         hideEmptyState();
         
         // Update results count
-        resultsCountLabel.setText("Found " + totalResults + " result" + (totalResults == 1 ? "" : "s"));
+        resultCountLabel.setText(totalResults + " result" + (totalResults == 1 ? "" : "s"));
         
-        // Display based on filter
-        switch (currentFilter) {
-            case "questions":
-                displayQuestionResults();
-                break;
-            case "users":
-                displayUserResults();
-                break;
-            default:
-                displayQuestionResults();
-                if (!foundQuestions.isEmpty() && !foundUsers.isEmpty()) {
-                    resultsList.getChildren().add(createSectionDivider("Users"));
-                }
-                displayUserResults();
-                break;
+        // Display questions
+        displayQuestionResults();
+        
+        // Display users if any
+        if (!foundUsers.isEmpty()) {
+            resultsContainer.getChildren().add(createSectionDivider("Users"));
+            displayUserResults();
         }
     }
     
@@ -159,13 +125,11 @@ public class SearchResultsController {
     private void displayQuestionResults() {
         if (foundQuestions.isEmpty()) return;
         
-        if (currentFilter.equals("all")) {
-            resultsList.getChildren().add(createSectionDivider("Questions (" + foundQuestions.size() + ")"));
-        }
+        resultsContainer.getChildren().add(createSectionDivider("Questions (" + foundQuestions.size() + ")"));
         
         for (Question question : foundQuestions) {
             VBox questionCard = createQuestionCard(question);
-            resultsList.getChildren().add(questionCard);
+            resultsContainer.getChildren().add(questionCard);
         }
     }
     
@@ -175,13 +139,9 @@ public class SearchResultsController {
     private void displayUserResults() {
         if (foundUsers.isEmpty()) return;
         
-        if (currentFilter.equals("all")) {
-            resultsList.getChildren().add(createSectionDivider("Users (" + foundUsers.size() + ")"));
-        }
-        
         for (User user : foundUsers) {
             HBox userCard = createUserCard(user);
-            resultsList.getChildren().add(userCard);
+            resultsContainer.getChildren().add(userCard);
         }
     }
     
@@ -356,76 +316,6 @@ public class SearchResultsController {
     }
     
     /**
-     * Filter: Show all results.
-     */
-    @FXML
-    private void showAll() {
-        currentFilter = "all";
-        updateActiveTab(allTabBtn);
-        displayResults();
-    }
-    
-    /**
-     * Filter: Show questions only.
-     */
-    @FXML
-    private void showQuestions() {
-        currentFilter = "questions";
-        updateActiveTab(questionsTabBtn);
-        displayResults();
-    }
-    
-    /**
-     * Filter: Show users only.
-     */
-    @FXML
-    private void showUsers() {
-        currentFilter = "users";
-        updateActiveTab(usersTabBtn);
-        displayResults();
-    }
-    
-    /**
-     * Update active tab.
-     */
-    private void updateActiveTab(Button activeButton) {
-        allTabBtn.getStyleClass().remove("active-tab");
-        questionsTabBtn.getStyleClass().remove("active-tab");
-        usersTabBtn.getStyleClass().remove("active-tab");
-        activeButton.getStyleClass().add("active-tab");
-    }
-    
-    /**
-     * Show empty state.
-     */
-    private void showEmptyState(String title, String subtitle) {
-        resultsScrollPane.setManaged(false);
-        resultsScrollPane.setVisible(false);
-        emptyStatePane.setManaged(true);
-        emptyStatePane.setVisible(true);
-        emptyStateTitle.setText(title);
-        emptyStateSubtitle.setText(subtitle);
-    }
-    
-    /**
-     * Hide empty state.
-     */
-    private void hideEmptyState() {
-        resultsScrollPane.setManaged(true);
-        resultsScrollPane.setVisible(true);
-        emptyStatePane.setManaged(false);
-        emptyStatePane.setVisible(false);
-    }
-    
-    /**
-     * Hide initial state.
-     */
-    private void hideInitialState() {
-        initialStatePane.setManaged(false);
-        initialStatePane.setVisible(false);
-    }
-    
-    /**
      * Navigate back.
      */
     @FXML
@@ -439,6 +329,26 @@ public class SearchResultsController {
     }
     
     /**
+     * Show empty state.
+     */
+    private void showEmptyState() {
+        if (emptyState != null) {
+            emptyState.setManaged(true);
+            emptyState.setVisible(true);
+        }
+    }
+    
+    /**
+     * Hide empty state.
+     */
+    private void hideEmptyState() {
+        if (emptyState != null) {
+            emptyState.setManaged(false);
+            emptyState.setVisible(false);
+        }
+    }
+    
+    /**
      * Navigate to login.
      */
     private void goToLogin() {
@@ -448,13 +358,6 @@ public class SearchResultsController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    /**
-     * Show warning toast.
-     */
-    private void showWarning(String message) {
-        ToastNotification.show(message, ToastNotification.NotificationType.WARNING);
     }
     
     /**

@@ -3,15 +3,10 @@ package com.kna.controller;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 import com.kna.Main;
-import com.kna.dao.AnswerDAO;
-import com.kna.dao.CoinDAO;
-import com.kna.dao.NotificationDAO;
 import com.kna.dao.QuestionDAO;
 import com.kna.dao.UserDAO;
-import com.kna.model.CoinTransaction;
 import com.kna.model.Question;
 import com.kna.model.User;
 import com.kna.util.SessionManager;
@@ -22,11 +17,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.TableCell;
 import javafx.util.Callback;
@@ -38,41 +30,29 @@ import javafx.geometry.Pos;
  */
 public class AdminPanelController {
     
-    @FXML private Button backButton;
-    
-    // Tab Buttons
-    @FXML private Button dashboardTabBtn;
-    @FXML private Button usersTabBtn;
-    @FXML private Button questionsTabBtn;
-    @FXML private Button transactionsTabBtn;
-    @FXML private Button settingsTabBtn;
-    
-    // Panes
-    @FXML private ScrollPane dashboardPane;
-    @FXML private ScrollPane usersPane;
-    @FXML private ScrollPane questionsPane;
-    @FXML private ScrollPane transactionsPane;
-    @FXML private ScrollPane settingsPane;
-    
-    // Dashboard Stats
+    // Users Tab Stats
     @FXML private Label totalUsersLabel;
-    @FXML private Label totalQuestionsLabel;
-    @FXML private Label totalAnswersLabel;
-    @FXML private Label totalCoinsLabel;
-    @FXML private Label transactionsTodayLabel;
+    @FXML private Label totalAdminsLabel;
     @FXML private Label activeUsersLabel;
     
+    // Questions Tab Stats
+    @FXML private Label totalQuestionsLabel;
+    @FXML private Label answeredQuestionsLabel;
+    @FXML private Label urgentQuestionsLabel;
+    
+    // Reports Tab Stats
+    @FXML private Label totalReportsLabel;
+    @FXML private Label pendingReportsLabel;
+    @FXML private Label resolvedReportsLabel;
+    
     // Users Table
-    @FXML private TextField userSearchField;
     @FXML private TableView<User> usersTable;
     @FXML private TableColumn<User, Integer> userIdCol;
-    @FXML private TableColumn<User, String> userNameCol;
+    @FXML private TableColumn<User, String> userUsernameCol;
     @FXML private TableColumn<User, String> userEmailCol;
-    @FXML private TableColumn<User, String> userPasswordCol;
-    @FXML private TableColumn<User, String> userDeptCol;
     @FXML private TableColumn<User, Integer> userCoinsCol;
     @FXML private TableColumn<User, Integer> userReputationCol;
-    @FXML private TableColumn<User, String> userStatusCol;
+    @FXML private TableColumn<User, String> userRoleCol;
     @FXML private TableColumn<User, Void> userActionsCol;
     
     // Questions Table
@@ -80,33 +60,22 @@ public class AdminPanelController {
     @FXML private TableColumn<Question, Integer> questionIdCol;
     @FXML private TableColumn<Question, String> questionTitleCol;
     @FXML private TableColumn<Question, String> questionCategoryCol;
-    @FXML private TableColumn<Question, String> questionUserCol;
-    @FXML private TableColumn<Question, Integer> questionAnswersCol;
-    @FXML private TableColumn<Question, Timestamp> questionDateCol;
+    @FXML private TableColumn<Question, Integer> questionRewardCol;
+    @FXML private TableColumn<Question, Boolean> questionUrgentCol;
+    @FXML private TableColumn<Question, String> questionAskerCol;
     @FXML private TableColumn<Question, Void> questionActionsCol;
     
-    // Transactions Table
-    @FXML private TableView<CoinTransaction> transactionsTable;
-    @FXML private TableColumn<CoinTransaction, Integer> transactionIdCol;
-    @FXML private TableColumn<CoinTransaction, String> transactionUserCol;
-    @FXML private TableColumn<CoinTransaction, String> transactionTypeCol;
-    @FXML private TableColumn<CoinTransaction, Integer> transactionAmountCol;
-    @FXML private TableColumn<CoinTransaction, String> transactionRefCol;
-    @FXML private TableColumn<CoinTransaction, Timestamp> transactionDateCol;
-    
-    // Settings Fields
-    @FXML private TextField baseQuestionCostField;
-    @FXML private TextField urgentQuestionCostField;
-    @FXML private TextField startingCoinsField;
-    @FXML private TextField upvotePointsField;
-    @FXML private TextField acceptedPointsField;
-    @FXML private TextField maxUnevaluatedField;
+    // Reports Table
+    @FXML private TableView<?> reportsTable;
+    @FXML private TableColumn<?, Integer> reportIdCol;
+    @FXML private TableColumn<?, String> reportTypeCol;
+    @FXML private TableColumn<?, String> reportReasonCol;
+    @FXML private TableColumn<?, String> reportStatusCol;
+    @FXML private TableColumn<?, Timestamp> reportDateCol;
+    @FXML private TableColumn<?, Void> reportActionsCol;
     
     private UserDAO userDAO;
     private QuestionDAO questionDAO;
-    private AnswerDAO answerDAO;
-    private CoinDAO coinDAO;
-    private NotificationDAO notificationDAO;
     private User currentUser;
     
     /**
@@ -116,9 +85,6 @@ public class AdminPanelController {
     public void initialize() {
         userDAO = new UserDAO();
         questionDAO = new QuestionDAO();
-        answerDAO = new AnswerDAO();
-        coinDAO = new CoinDAO();
-        notificationDAO = new NotificationDAO();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
         if (currentUser == null || !currentUser.isAdmin()) {
@@ -128,7 +94,9 @@ public class AdminPanelController {
         }
         
         initializeTables();
-        loadDashboardStats();
+        loadStats();
+        loadAllUsers();
+        loadAllQuestions();
     }
     
     /**
@@ -136,89 +104,92 @@ public class AdminPanelController {
      */
     private void initializeTables() {
         // Users table
-        userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
-        userNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        userEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
-        userDeptCol.setCellValueFactory(new PropertyValueFactory<>("department"));
-        userCoinsCol.setCellValueFactory(new PropertyValueFactory<>("coins"));
-        userReputationCol.setCellValueFactory(new PropertyValueFactory<>("reputation"));
-        userStatusCol.setCellValueFactory(cellData -> 
-            new javafx.beans.property.SimpleStringProperty(cellData.getValue().isActive() ? "Active" : "Inactive")
-        );
+        if (userIdCol != null) userIdCol.setCellValueFactory(new PropertyValueFactory<>("userId"));
+        if (userUsernameCol != null) userUsernameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        if (userEmailCol != null) userEmailCol.setCellValueFactory(new PropertyValueFactory<>("email"));
+        if (userCoinsCol != null) userCoinsCol.setCellValueFactory(new PropertyValueFactory<>("coins"));
+        if (userReputationCol != null) userReputationCol.setCellValueFactory(new PropertyValueFactory<>("reputation"));
+        if (userRoleCol != null) {
+            userRoleCol.setCellValueFactory(cellData -> 
+                new javafx.beans.property.SimpleStringProperty(cellData.getValue().isAdmin() ? "Admin" : "User")
+            );
+        }
         
         // Add Reset Password button to actions column
-        Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = new Callback<>() {
-            @Override
-            public TableCell<User, Void> call(final TableColumn<User, Void> param) {
-                final TableCell<User, Void> cell = new TableCell<>() {
-                    private final Button resetBtn = new Button("Reset Password");
-                    {
-                        resetBtn.getStyleClass().add("warning-button");
-                        resetBtn.setOnAction(event -> {
-                            User user = getTableView().getItems().get(getIndex());
-                            resetPassword(user);
-                        });
-                    }
-                    
-                    @Override
-                    public void updateItem(Void item, boolean empty) {
-                        super.updateItem(item, empty);
-                        if (empty) {
-                            setGraphic(null);
-                        } else {
-                            setGraphic(resetBtn);
-                            setAlignment(Pos.CENTER);
+        if (userActionsCol != null) {
+            Callback<TableColumn<User, Void>, TableCell<User, Void>> cellFactory = new Callback<>() {
+                @Override
+                public TableCell<User, Void> call(final TableColumn<User, Void> param) {
+                    final TableCell<User, Void> cell = new TableCell<>() {
+                        private final Button resetBtn = new Button("Reset Password");
+                        {
+                            resetBtn.getStyleClass().add("warning-button");
+                            resetBtn.setOnAction(event -> {
+                                User user = getTableView().getItems().get(getIndex());
+                                resetPassword(user);
+                            });
                         }
-                    }
-                };
-                return cell;
-            }
-        };
-        userActionsCol.setCellFactory(cellFactory);
+                        
+                        @Override
+                        public void updateItem(Void item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setGraphic(null);
+                            } else {
+                                setGraphic(resetBtn);
+                                setAlignment(Pos.CENTER);
+                            }
+                        }
+                    };
+                    return cell;
+                }
+            };
+            userActionsCol.setCellFactory(cellFactory);
+        }
         
         // Questions table
-        questionIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        questionTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
-        questionCategoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
-        questionAnswersCol.setCellValueFactory(new PropertyValueFactory<>("answerCount"));
-        questionDateCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        
-        // Transactions table
-        transactionIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        transactionTypeCol.setCellValueFactory(new PropertyValueFactory<>("transactionType"));
-        transactionAmountCol.setCellValueFactory(new PropertyValueFactory<>("amount"));
-        transactionRefCol.setCellValueFactory(new PropertyValueFactory<>("referenceType"));
-        transactionDateCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        if (questionIdCol != null) questionIdCol.setCellValueFactory(new PropertyValueFactory<>("id"));
+        if (questionTitleCol != null) questionTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        if (questionCategoryCol != null) questionCategoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
+        if (questionRewardCol != null) questionRewardCol.setCellValueFactory(new PropertyValueFactory<>("coinReward"));
+        if (questionUrgentCol != null) questionUrgentCol.setCellValueFactory(new PropertyValueFactory<>("urgent"));
+        if (questionAskerCol != null) questionAskerCol.setCellValueFactory(new PropertyValueFactory<>("userName"));
     }
     
     /**
-     * Load dashboard statistics.
+     * Load all statistics.
      */
-    private void loadDashboardStats() {
+    private void loadStats() {
         try {
             List<User> allUsers = userDAO.getAllUsers();
             List<Question> allQuestions = questionDAO.getAllQuestions(null, null, null, 1000, 0);
             
-            totalUsersLabel.setText(String.valueOf(allUsers.size()));
-            totalQuestionsLabel.setText(String.valueOf(allQuestions.size()));
-            
-            // Count total answers
-            int totalAnswers = 0;
-            for (Question q : allQuestions) {
-                totalAnswers += q.getAnswerCount();
+            // Users stats
+            if (totalUsersLabel != null) totalUsersLabel.setText(String.valueOf(allUsers.size()));
+            if (totalAdminsLabel != null) {
+                long adminCount = allUsers.stream().filter(User::isAdmin).count();
+                totalAdminsLabel.setText(String.valueOf(adminCount));
             }
-            totalAnswersLabel.setText(String.valueOf(totalAnswers));
+            if (activeUsersLabel != null) {
+                long activeUsers = allUsers.stream().filter(User::isActive).count();
+                activeUsersLabel.setText(String.valueOf(activeUsers));
+            }
             
-            // Calculate total coins in system
-            int totalCoins = allUsers.stream().mapToInt(User::getCoins).sum();
-            totalCoinsLabel.setText(String.valueOf(totalCoins));
+            // Questions stats
+            if (totalQuestionsLabel != null) totalQuestionsLabel.setText(String.valueOf(allQuestions.size()));
+            if (answeredQuestionsLabel != null) {
+                long answeredCount = allQuestions.stream().filter(Question::isAnswered).count();
+                answeredQuestionsLabel.setText(String.valueOf(answeredCount));
+            }
+            if (urgentQuestionsLabel != null) {
+                long urgentCount = allQuestions.stream().filter(Question::isUrgent).count();
+                urgentQuestionsLabel.setText(String.valueOf(urgentCount));
+            }
             
-            // Count active users
-            long activeUsers = allUsers.stream().filter(User::isActive).count();
-            activeUsersLabel.setText(String.valueOf(activeUsers));
-            
-            // Placeholder for transactions today
-            transactionsTodayLabel.setText("N/A");
+            // Reports stats (placeholder - set to 0)
+            if (totalReportsLabel != null) totalReportsLabel.setText("0");
+            if (pendingReportsLabel != null) pendingReportsLabel.setText("0");
+            if (resolvedReportsLabel != null) resolvedReportsLabel.setText("0");
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -227,21 +198,13 @@ public class AdminPanelController {
     }
     
     /**
-     * Show dashboard view.
+     * Refresh users data.
      */
     @FXML
-    private void showDashboard() {
-        switchToPane(dashboardPane, dashboardTabBtn);
-        loadDashboardStats();
-    }
-    
-    /**
-     * Show users view.
-     */
-    @FXML
-    private void showUsers() {
-        switchToPane(usersPane, usersTabBtn);
+    private void refreshUsers() {
         loadAllUsers();
+        loadStats();
+        showSuccess("Users refreshed!");
     }
     
     /**
@@ -251,31 +214,10 @@ public class AdminPanelController {
         try {
             List<User> users = userDAO.getAllUsers();
             ObservableList<User> userList = FXCollections.observableArrayList(users);
-            usersTable.setItems(userList);
+            if (usersTable != null) usersTable.setItems(userList);
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Failed to load users.");
-        }
-    }
-    
-    /**
-     * Search users.
-     */
-    @FXML
-    private void searchUsers() {
-        String query = userSearchField.getText().trim();
-        if (query.isEmpty()) {
-            loadAllUsers();
-            return;
-        }
-        
-        try {
-            List<User> users = userDAO.searchUsers(query);
-            ObservableList<User> userList = FXCollections.observableArrayList(users);
-            usersTable.setItems(userList);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Search failed.");
         }
     }
     
@@ -296,12 +238,13 @@ public class AdminPanelController {
     }
     
     /**
-     * Show questions view.
+     * Refresh questions data.
      */
     @FXML
-    private void showQuestions() {
-        switchToPane(questionsPane, questionsTabBtn);
+    private void refreshQuestions() {
         loadAllQuestions();
+        loadStats();
+        showSuccess("Questions refreshed!");
     }
     
     /**
@@ -311,7 +254,7 @@ public class AdminPanelController {
         try {
             List<Question> questions = questionDAO.getAllQuestions(null, null, null, 1000, 0);
             ObservableList<Question> questionList = FXCollections.observableArrayList(questions);
-            questionsTable.setItems(questionList);
+            if (questionsTable != null) questionsTable.setItems(questionList);
         } catch (SQLException e) {
             e.printStackTrace();
             showError("Failed to load questions.");
@@ -319,173 +262,11 @@ public class AdminPanelController {
     }
     
     /**
-     * Show transactions view.
+     * Refresh reports data.
      */
     @FXML
-    private void showTransactions() {
-        switchToPane(transactionsPane, transactionsTabBtn);
-        loadAllTransactions();
-    }
-    
-    /**
-     * Load all transactions into table.
-     */
-    private void loadAllTransactions() {
-        try {
-            // Get transactions for all users (simplified - get from first 100 users)
-            List<User> users = userDAO.getAllUsers();
-            ObservableList<CoinTransaction> allTransactions = FXCollections.observableArrayList();
-            
-            for (User user : users) {
-                List<CoinTransaction> userTransactions = coinDAO.getTransactionsByUserId(user.getId(), 10);
-                allTransactions.addAll(userTransactions);
-                if (allTransactions.size() > 100) break; // Limit to 100 for performance
-            }
-            
-            transactionsTable.setItems(allTransactions);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            showError("Failed to load transactions.");
-        }
-    }
-    
-    /**
-     * Show settings view.
-     */
-    @FXML
-    private void showSettings() {
-        switchToPane(settingsPane, settingsTabBtn);
-    }
-    
-    /**
-     * Switch to a specific pane.
-     */
-    private void switchToPane(ScrollPane targetPane, Button activeButton) {
-        // Hide all panes
-        dashboardPane.setManaged(false);
-        dashboardPane.setVisible(false);
-        usersPane.setManaged(false);
-        usersPane.setVisible(false);
-        questionsPane.setManaged(false);
-        questionsPane.setVisible(false);
-        transactionsPane.setManaged(false);
-        transactionsPane.setVisible(false);
-        settingsPane.setManaged(false);
-        settingsPane.setVisible(false);
-        
-        // Show target pane
-        targetPane.setManaged(true);
-        targetPane.setVisible(true);
-        
-        // Update active tab
-        dashboardTabBtn.getStyleClass().remove("active-tab");
-        usersTabBtn.getStyleClass().remove("active-tab");
-        questionsTabBtn.getStyleClass().remove("active-tab");
-        transactionsTabBtn.getStyleClass().remove("active-tab");
-        settingsTabBtn.getStyleClass().remove("active-tab");
-        activeButton.getStyleClass().add("active-tab");
-    }
-    
-    /**
-     * Create announcement to all users.
-     */
-    @FXML
-    private void createAnnouncement() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Create Announcement");
-        dialog.setHeaderText("Send announcement to all users");
-        dialog.setContentText("Enter announcement message:");
-        
-        Optional<String> result = dialog.showAndWait();
-        result.ifPresent(message -> {
-            if (!message.trim().isEmpty()) {
-                try {
-                    notificationDAO.createAnnouncement("System Announcement", message);
-                    showSuccess("Announcement sent to all users!");
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    showError("Failed to send announcement.");
-                }
-            }
-        });
-    }
-    
-    /**
-     * Refresh statistics.
-     */
-    @FXML
-    private void refreshStats() {
-        loadDashboardStats();
-        showSuccess("Statistics refreshed!");
-    }
-    
-    /**
-     * View reports (placeholder).
-     */
-    @FXML
-    private void viewReports() {
+    private void refreshReports() {
         showInfo("Reports feature coming soon!");
-    }
-    
-    /**
-     * Save coin settings.
-     */
-    @FXML
-    private void saveCoinSettings() {
-        try {
-            int baseCost = Integer.parseInt(baseQuestionCostField.getText());
-            int urgentCost = Integer.parseInt(urgentQuestionCostField.getText());
-            int startingCoins = Integer.parseInt(startingCoinsField.getText());
-            
-            // Validation
-            if (baseCost < 1 || urgentCost < baseCost || startingCoins < 0) {
-                showError("Invalid coin settings. Check your values.");
-                return;
-            }
-            
-            showSuccess("Coin settings saved! (Note: Restart required for changes to take effect)");
-        } catch (NumberFormatException e) {
-            showError("Please enter valid numbers.");
-        }
-    }
-    
-    /**
-     * Save reputation settings.
-     */
-    @FXML
-    private void saveReputationSettings() {
-        try {
-            int upvotePoints = Integer.parseInt(upvotePointsField.getText());
-            int acceptedPoints = Integer.parseInt(acceptedPointsField.getText());
-            
-            if (upvotePoints < 0 || acceptedPoints < 0) {
-                showError("Points must be positive numbers.");
-                return;
-            }
-            
-            showSuccess("Reputation settings saved! (Note: Restart required for changes to take effect)");
-        } catch (NumberFormatException e) {
-            showError("Please enter valid numbers.");
-        }
-    }
-    
-    /**
-     * Save system limits.
-     */
-    @FXML
-    private void saveSystemLimits() {
-        try {
-            int maxUnevaluated = Integer.parseInt(maxUnevaluatedField.getText());
-            
-            if (maxUnevaluated < 1) {
-                showError("Maximum must be at least 1.");
-                return;
-            }
-            
-            showSuccess("System limits saved! (Note: Restart required for changes to take effect)");
-        } catch (NumberFormatException e) {
-            showError("Please enter a valid number.");
-        }
     }
     
     /**

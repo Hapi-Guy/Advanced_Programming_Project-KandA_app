@@ -47,6 +47,12 @@ public class DashboardController {
     @FXML private CheckBox unansweredOnlyCheckbox;
     @FXML private VBox questionFeedContainer;
     
+    // Dashboard stat labels
+    @FXML private Label totalQuestionsLabel;
+    @FXML private Label answeredQuestionsLabel;
+    @FXML private Label pendingQuestionsLabel;
+    @FXML private Label urgentQuestionsLabel;
+    
     private final AuthService authService;
     private final QuestionService questionService;
     private final NotificationDAO notificationDAO;
@@ -69,7 +75,10 @@ public class DashboardController {
         }
         
         // Populate category filter
-//        categoryFilter.getItems().addAll("All", "CSE", "EEE", "CE", "ME", "IPE", "TE", "Other");
+        categoryFilter.getItems().addAll(
+            "All", "CSE", "EEE", "ECE", "MTE", "CE", "ME", "IEM", "TE", "Arch", "URP", 
+            "BME", "MSE", "LE", "ESE", "BECM", "ChE", "MATH", "HUM", "PHY", "CHEM", "General"
+        );
         
         // Update UI with user info
         updateUserInfo();
@@ -144,6 +153,9 @@ public class DashboardController {
                 50,
                 0
             );
+            
+            // Update dashboard stats
+            updateDashboardStats(questions);
 
             if (questions.isEmpty()) {
                 Label emptyLabel = new Label("No questions found. Be the first to ask!");
@@ -160,6 +172,20 @@ public class DashboardController {
         } catch (Exception e) {
             ToastNotification.showError("Failed to load questions: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    private void updateDashboardStats(List<Question> questions) {
+        if (totalQuestionsLabel != null) {
+            int total = questions.size();
+            int answered = (int) questions.stream().filter(Question::isAnswered).count();
+            int pending = total - answered;
+            int urgent = (int) questions.stream().filter(Question::isUrgent).count();
+            
+            totalQuestionsLabel.setText(String.valueOf(total));
+            answeredQuestionsLabel.setText(String.valueOf(answered));
+            pendingQuestionsLabel.setText(String.valueOf(pending));
+            urgentQuestionsLabel.setText(String.valueOf(urgent));
         }
     }
 

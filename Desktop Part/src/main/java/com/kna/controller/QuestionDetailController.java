@@ -1,5 +1,8 @@
 package com.kna.controller;
 
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import com.kna.Main;
 import com.kna.model.Answer;
 import com.kna.model.Question;
@@ -8,35 +11,46 @@ import com.kna.service.AnswerService;
 import com.kna.service.QuestionService;
 import com.kna.util.SessionManager;
 import com.kna.util.ToastNotification;
+
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 
 /**
  * QuestionDetailController - Displays question details and answers
  */
 public class QuestionDetailController {
     
-    @FXML private VBox questionCard;
-    @FXML private Label titleLabel;
+    // Question Card
+    @FXML private Label questionTitleLabel;
+    @FXML private Label questionDescriptionLabel;
     @FXML private Label categoryBadge;
-    @FXML private Label coinRewardLabel;
+    @FXML private Label rewardLabel;
     @FXML private Label urgentBadge;
-    @FXML private Label answeredBadge;
-    @FXML private Label descriptionLabel;
-    @FXML private VBox imageContainer;
-    @FXML private Label askedByLabel;
-    @FXML private Label timeLabel;
-    @FXML private Label viewCountLabel;
+    @FXML private Label askerLabel;
+    @FXML private Label dateLabel;
+    @FXML private Label answerCountLabel;
+    
+    // Answer Form
     @FXML private VBox answerFormContainer;
     @FXML private TextArea answerTextArea;
-    @FXML private Label answersHeaderLabel;
+    @FXML private Label answerErrorLabel;
+    
+    // Answers Section
+    @FXML private Label answersCountBadge;
     @FXML private VBox answersContainer;
+    @FXML private VBox noAnswersLabel;
     
     private final QuestionService questionService;
     private final AnswerService answerService;
@@ -51,6 +65,13 @@ public class QuestionDetailController {
     @FXML
     private void initialize() {
         currentUser = SessionManager.getInstance().getCurrentUser();
+        
+        // Try to load question from session
+        Integer questionId = (Integer) SessionManager.getInstance().getAttribute("viewQuestionId");
+        if (questionId != null) {
+            loadQuestion(questionId);
+            SessionManager.getInstance().removeAttribute("viewQuestionId");
+        }
     }
 
     public void loadQuestion(int questionId) {
@@ -72,34 +93,34 @@ public class QuestionDetailController {
     }
 
     private void displayQuestion() {
-        titleLabel.setText(currentQuestion.getTitle());
-        categoryBadge.setText(currentQuestion.getCategory());
-        coinRewardLabel.setText("💰 " + currentQuestion.getCoinReward() + " Coins Reward");
-        coinRewardLabel.setStyle("-fx-background-color: #FFF3E0; -fx-text-fill: #E65100; -fx-padding: 4px 10px; -fx-background-radius: 10px;");
-        descriptionLabel.setText(currentQuestion.getDescription());
+        if (questionTitleLabel != null) questionTitleLabel.setText(currentQuestion.getTitle());
+        if (categoryBadge != null) categoryBadge.setText(currentQuestion.getCategory());
+        if (rewardLabel != null) rewardLabel.setText(String.valueOf(currentQuestion.getCoinReward()));
+        if (questionDescriptionLabel != null) questionDescriptionLabel.setText(currentQuestion.getDescription());
         
         if (currentQuestion.isUrgent()) {
-            urgentBadge.setText("URGENT");
-            urgentBadge.setVisible(true);
+            if (urgentBadge != null) {
+                urgentBadge.setVisible(true);
+                urgentBadge.setManaged(true);
+            }
         }
         
-        if (currentQuestion.isAnswered()) {
-            answeredBadge.setText("✓ ANSWERED");
-            answeredBadge.setVisible(true);
-        }
+        if (askerLabel != null) askerLabel.setText(currentQuestion.getUserName());
         
-        askedByLabel.setText("Asked by: " + currentQuestion.getUserName());
-        
-        if (currentQuestion.getCreatedAt() != null) {
+        if (currentQuestion.getCreatedAt() != null && dateLabel != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
-            timeLabel.setText("Asked: " + currentQuestion.getCreatedAt().toLocalDateTime().format(formatter));
+            dateLabel.setText(currentQuestion.getCreatedAt().toLocalDateTime().format(formatter));
         }
         
-        viewCountLabel.setText("Views: " + currentQuestion.getViewCount());
+        if (answerCountLabel != null) {
+            answerCountLabel.setText(currentQuestion.getAnswerCount() + " answers");
+        }
         
         // Show answer form if not question owner
-        if (currentUser.getUserId() != currentQuestion.getUserId()) {
-            answerFormContainer.setVisible(true);
+        if (answerFormContainer != null && currentUser != null) {
+            boolean canAnswer = currentUser.getUserId() != currentQuestion.getUserId();
+            answerFormContainer.setVisible(canAnswer);
+            answerFormContainer.setManaged(canAnswer);
         }
     }
 
@@ -107,19 +128,26 @@ public class QuestionDetailController {
         try {
             List<Answer> answers = answerService.getAnswers(currentQuestion.getQuestionId());
             
-            answersHeaderLabel.setText("Answers (" + answers.size() + ")");
-            answersContainer.getChildren().clear();
+            if (answersCountBadge != null) answersCountBadge.setText(String.valueOf(answers.size()));
+            if (answersContainer != null) answersContainer.getChildren().clear();
             
             if (answers.isEmpty()) {
-                Label noAnswersLabel = new Label("No answers yet. Be the first to answer!");
-                noAnswersLabel.setStyle("-fx-text-fill: #757575; -fx-font-style: italic;");
-                answersContainer.getChildren().add(noAnswersLabel);
+                if (noAnswersLabel != null) {
+                    noAnswersLabel.setVisible(true);
+                    noAnswersLabel.setManaged(true);
+                }
                 return;
+            }
+            
+            // Hide empty state
+            if (noAnswersLabel != null) {
+                noAnswersLabel.setVisible(false);
+                noAnswersLabel.setManaged(false);
             }
             
             for (Answer answer : answers) {
                 VBox answerCard = createAnswerCard(answer);
-                answersContainer.getChildren().add(answerCard);
+                if (answersContainer != null) answersContainer.getChildren().add(answerCard);
             }
             
         } catch (Exception e) {
@@ -192,7 +220,13 @@ public class QuestionDetailController {
     private void submitAnswer() {
         String content = answerTextArea.getText();
         
+        // Clear previous error
+        if (answerErrorLabel != null) answerErrorLabel.setText("");
+        
         if (content == null || content.trim().isEmpty()) {
+            if (answerErrorLabel != null) {
+                answerErrorLabel.setText("Please write an answer");
+            }
             ToastNotification.showWarning("Please write an answer");
             return;
         }
@@ -205,6 +239,9 @@ public class QuestionDetailController {
             loadAnswers();
             
         } catch (Exception e) {
+            if (answerErrorLabel != null) {
+                answerErrorLabel.setText(e.getMessage());
+            }
             ToastNotification.showError(e.getMessage());
         }
     }

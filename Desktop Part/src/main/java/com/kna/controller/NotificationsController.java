@@ -18,7 +18,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
@@ -30,16 +29,9 @@ import javafx.scene.layout.VBox;
  */
 public class NotificationsController {
     
-    @FXML private Button backButton;
-    @FXML private ScrollPane notificationsScrollPane;
-    @FXML private VBox notificationsList;
-    @FXML private StackPane emptyStatePane;
-    
-    // Filter Tabs
-    @FXML private Button allTabBtn;
-    @FXML private Button unreadTabBtn;
-    @FXML private Button answersTabBtn;
-    @FXML private Button coinsTabBtn;
+    @FXML private Button markAllReadButton;
+    @FXML private VBox notificationsContainer;
+    @FXML private VBox emptyState;
     
     private NotificationDAO notificationDAO;
     private User currentUser;
@@ -106,7 +98,7 @@ public class NotificationsController {
      * Display notifications in the list.
      */
     private void displayNotifications(List<Notification> notifications) {
-        notificationsList.getChildren().clear();
+        notificationsContainer.getChildren().clear();
         
         if (notifications.isEmpty()) {
             showEmptyState();
@@ -117,7 +109,7 @@ public class NotificationsController {
         
         for (Notification notification : notifications) {
             VBox notificationCard = createNotificationCard(notification);
-            notificationsList.getChildren().add(notificationCard);
+            notificationsContainer.getChildren().add(notificationCard);
         }
     }
     
@@ -284,75 +276,23 @@ public class NotificationsController {
     }
     
     /**
-     * Filter: Show all notifications.
-     */
-    @FXML
-    private void showAllNotifications() {
-        currentFilter = "all";
-        updateActiveTab(allTabBtn);
-        loadNotifications();
-    }
-    
-    /**
-     * Filter: Show unread notifications only.
-     */
-    @FXML
-    private void showUnreadNotifications() {
-        currentFilter = "unread";
-        updateActiveTab(unreadTabBtn);
-        loadNotifications();
-    }
-    
-    /**
-     * Filter: Show answer notifications only.
-     */
-    @FXML
-    private void showAnswerNotifications() {
-        currentFilter = "answers";
-        updateActiveTab(answersTabBtn);
-        loadNotifications();
-    }
-    
-    /**
-     * Filter: Show coin-related notifications only.
-     */
-    @FXML
-    private void showCoinNotifications() {
-        currentFilter = "coins";
-        updateActiveTab(coinsTabBtn);
-        loadNotifications();
-    }
-    
-    /**
-     * Update the active tab styling.
-     */
-    private void updateActiveTab(Button activeButton) {
-        allTabBtn.getStyleClass().remove("active-tab");
-        unreadTabBtn.getStyleClass().remove("active-tab");
-        answersTabBtn.getStyleClass().remove("active-tab");
-        coinsTabBtn.getStyleClass().remove("active-tab");
-        
-        activeButton.getStyleClass().add("active-tab");
-    }
-    
-    /**
      * Show empty state when no notifications.
      */
     private void showEmptyState() {
-        notificationsScrollPane.setManaged(false);
-        notificationsScrollPane.setVisible(false);
-        emptyStatePane.setManaged(true);
-        emptyStatePane.setVisible(true);
+        if (emptyState != null) {
+            emptyState.setManaged(true);
+            emptyState.setVisible(true);
+        }
     }
     
     /**
      * Hide empty state.
      */
     private void hideEmptyState() {
-        notificationsScrollPane.setManaged(true);
-        notificationsScrollPane.setVisible(true);
-        emptyStatePane.setManaged(false);
-        emptyStatePane.setVisible(false);
+        if (emptyState != null) {
+            emptyState.setManaged(false);
+            emptyState.setVisible(false);
+        }
     }
     
     /**

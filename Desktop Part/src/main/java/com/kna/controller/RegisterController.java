@@ -6,9 +6,6 @@ import com.kna.service.AuthService;
 import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -18,17 +15,11 @@ import javafx.scene.control.TextField;
  */
 public class RegisterController {
     
-    @FXML private TextField nameField;
+    @FXML private TextField usernameField;
     @FXML private TextField emailField;
-    @FXML private TextField phoneField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
-    @FXML private ComboBox<String> departmentComboBox;
-    @FXML private ComboBox<String> yearComboBox;
-    @FXML private Button registerButton;
-    @FXML private Hyperlink loginLink;
     @FXML private Label errorLabel;
-    @FXML private Label successLabel;
     
     private final AuthService authService;
 
@@ -38,47 +29,47 @@ public class RegisterController {
 
     @FXML
     private void initialize() {
-        // Populate department ComboBox
-        departmentComboBox.getItems().addAll(
-            "CSE", "EEE", "CE", "ME", "IPE", "TE", "GCE", "URP", "ARCH", "Other"
-        );
-        
-        // Populate year ComboBox
-        yearComboBox.getItems().addAll("1", "2", "3", "4", "5");
-        
-        // Clear messages when typing
-        nameField.textProperty().addListener((obs, old, newVal) -> clearMessages());
-        emailField.textProperty().addListener((obs, old, newVal) -> clearMessages());
-        passwordField.textProperty().addListener((obs, old, newVal) -> clearMessages());
+        // Clear error when typing
+        if (usernameField != null) {
+            usernameField.textProperty().addListener((obs, old, newVal) -> clearError());
+        }
+        if (emailField != null) {
+            emailField.textProperty().addListener((obs, old, newVal) -> clearError());
+        }
+        if (passwordField != null) {
+            passwordField.textProperty().addListener((obs, old, newVal) -> clearError());
+        }
     }
 
     @FXML
     private void handleRegister() {
         // Get form data
-        String name = nameField.getText();
-        String email = emailField.getText();
-        String phone = phoneField.getText();
-        String password = passwordField.getText();
-        String confirmPassword = confirmPasswordField.getText();
-        String department = departmentComboBox.getValue();
-        String yearStr = yearComboBox.getValue();
+        String username = usernameField != null ? usernameField.getText() : "";
+        String email = emailField != null ? emailField.getText() : "";
+        String password = passwordField != null ? passwordField.getText() : "";
+        String confirmPassword = confirmPasswordField != null ? confirmPasswordField.getText() : "";
         
-        // Clear previous messages
-        clearMessages();
+        // Clear previous error
+        clearError();
         
         // Validate input
-        if (name == null || name.trim().isEmpty()) {
-            showError("Please enter your full name");
+        if (username.trim().isEmpty()) {
+            showError("Please enter a username");
             return;
         }
         
-        if (email == null || email.trim().isEmpty()) {
+        if (email.trim().isEmpty()) {
             showError("Please enter your email");
             return;
         }
         
-        if (password == null || password.isEmpty()) {
+        if (password.isEmpty()) {
             showError("Please enter a password");
+            return;
+        }
+        
+        if (password.length() < 6) {
+            showError("Password must be at least 6 characters");
             return;
         }
         
@@ -87,33 +78,9 @@ public class RegisterController {
             return;
         }
         
-        if (department == null) {
-            showError("Please select your department");
-            return;
-        }
-        
-        if (yearStr == null) {
-            showError("Please select your academic year");
-            return;
-        }
-        
-        int year;
         try {
-            year = Integer.parseInt(yearStr);
-        } catch (NumberFormatException e) {
-            showError("Invalid academic year");
-            return;
-        }
-        
-        // Disable register button
-        registerButton.setDisable(true);
-        
-        try {
-            // Attempt registration
-            User user = authService.register(email, phone, password, name, department, year);
-            
-            // Show success message
-            showSuccess("Registration successful! Logging you in...");
+            // Attempt registration with simplified parameters
+            User user = authService.register(email, "", password, username, "General", 1);
             
             // Auto login
             authService.login(email, password);
@@ -127,30 +94,26 @@ public class RegisterController {
             
         } catch (Exception e) {
             showError(e.getMessage());
-            registerButton.setDisable(false);
         }
     }
 
     @FXML
-    private void handleLogin() {
+    private void goToLogin() {
         // Navigate to login screen
         Main.switchScene("/fxml/Login.fxml", "KnA - Login");
     }
 
     private void showError(String message) {
-        errorLabel.setText(message);
-        errorLabel.setVisible(true);
-        successLabel.setVisible(false);
+        if (errorLabel != null) {
+            errorLabel.setText(message);
+            errorLabel.setVisible(true);
+        }
     }
 
-    private void showSuccess(String message) {
-        successLabel.setText(message);
-        successLabel.setVisible(true);
-        errorLabel.setVisible(false);
-    }
-
-    private void clearMessages() {
-        errorLabel.setVisible(false);
-        successLabel.setVisible(false);
+    private void clearError() {
+        if (errorLabel != null) {
+            errorLabel.setText("");
+            errorLabel.setVisible(false);
+        }
     }
 }

@@ -9,7 +9,6 @@ import com.kna.util.ToastNotification;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -24,28 +23,29 @@ public class ProfileController {
     
     // Profile Header
     @FXML private Label avatarLabel;
-    @FXML private Label nameLabel;
-    @FXML private Label emailLabel;
-    @FXML private Label coinsLabel;
+    @FXML private Label usernameDisplayLabel;
+    @FXML private Label emailDisplayLabel;
+    @FXML private Label coinBalanceLabel;
     @FXML private Label reputationLabel;
+    @FXML private Label roleBadge;
     
     // Statistics
     @FXML private Label questionsAskedLabel;
     @FXML private Label answersGivenLabel;
     @FXML private Label acceptedAnswersLabel;
-    @FXML private Label acceptanceRateLabel;
+    @FXML private Label memberSinceLabel;
     
     // Editable Fields
-    @FXML private TextField nameField;
+    @FXML private TextField usernameField;
     @FXML private TextField emailField;
-    @FXML private TextField phoneField;
-    @FXML private ComboBox<String> departmentCombo;
-    @FXML private ComboBox<String> yearCombo;
     
     // Password Fields
     @FXML private PasswordField currentPasswordField;
     @FXML private PasswordField newPasswordField;
     @FXML private PasswordField confirmPasswordField;
+    
+    // Status
+    @FXML private Label statusLabel;
     
     private UserDAO userDAO;
     private AuthService authService;
@@ -60,15 +60,6 @@ public class ProfileController {
         userDAO = new UserDAO();
         authService = new AuthService();
         currentUser = SessionManager.getInstance().getCurrentUser();
-        
-        // Populate department ComboBox
-        departmentCombo.getItems().addAll(
-            "CSE", "EEE", "CE", "ME", "IPE", "TE", "NAME", "Arch", "URP", 
-            "BME", "MSE", "GCE", "WRE", "BECM"
-        );
-        
-        // Populate year ComboBox
-        yearCombo.getItems().addAll("1st Year", "2nd Year", "3rd Year", "4th Year", "Graduate");
         
         if (currentUser != null) {
             loadUserProfile();
@@ -100,28 +91,33 @@ public class ProfileController {
         // Display profile header
         String initials = getInitials(currentUser.getName());
         avatarLabel.setText(initials);
-        nameLabel.setText(currentUser.getName());
-        emailLabel.setText(currentUser.getEmail());
-        coinsLabel.setText(String.valueOf(currentUser.getCoins()));
+        usernameDisplayLabel.setText(currentUser.getName());
+        emailDisplayLabel.setText(currentUser.getEmail());
+        coinBalanceLabel.setText(String.valueOf(currentUser.getCoins()));
         reputationLabel.setText(String.valueOf(currentUser.getReputation()));
+        
+        // Set role badge
+        if (roleBadge != null) {
+            roleBadge.setText(currentUser.isAdmin() ? "ADMIN" : "USER");
+            if (currentUser.isAdmin()) {
+                roleBadge.setStyle("-fx-background-color: #f44336;");
+            }
+        }
         
         // Display statistics
         questionsAskedLabel.setText(String.valueOf(currentUser.getQuestionsAsked()));
         answersGivenLabel.setText(String.valueOf(currentUser.getAnswersGiven()));
         acceptedAnswersLabel.setText(String.valueOf(currentUser.getAcceptedAnswers()));
         
-        double acceptanceRate = currentUser.getAcceptanceRate();
-        acceptanceRateLabel.setText(String.format("%.1f%%", acceptanceRate));
+        // Member since
+        if (memberSinceLabel != null && currentUser.getCreatedAt() != null) {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("MMM yyyy");
+            memberSinceLabel.setText(currentUser.getCreatedAt().toLocalDateTime().format(formatter));
+        }
         
         // Populate editable fields
-        nameField.setText(currentUser.getName());
+        usernameField.setText(currentUser.getName());
         emailField.setText(currentUser.getEmail());
-        // phoneField.setText(""); // Phone field not in User model
-        departmentCombo.setValue(currentUser.getDepartment());
-        // Convert int year to String format for ComboBox
-        int yearValue = currentUser.getAcademicYear();
-        String yearString = yearValue + (yearValue == 1 ? "st" : yearValue == 2 ? "nd" : yearValue == 3 ? "rd" : "th") + " Year";
-        yearCombo.setValue(yearString);
     }
     
     /**
@@ -144,11 +140,9 @@ public class ProfileController {
      * Save profile changes to database.
      */
     @FXML
-    private void saveProfile() {
-        String name = nameField.getText().trim();
-        // String phone = phoneField.getText().trim(); // Phone field not in User model
-        String department = departmentCombo.getValue();
-        String year = yearCombo.getValue();
+    private void updateProfile() {
+        String name = usernameField.getText().trim();
+        String email = emailField.getText().trim();
         
         // Validation
         if (name.isEmpty()) {
@@ -156,23 +150,14 @@ public class ProfileController {
             return;
         }
         
-        if (department == null || department.isEmpty()) {
-            showError("Please select a department.");
-            return;
-        }
-        
-        if (year == null || year.isEmpty()) {
-            showError("Please select an academic year.");
+        if (email.isEmpty()) {
+            showError("Email cannot be empty.");
             return;
         }
         
         // Update user object
         currentUser.setName(name);
-        // currentUser.setPhone(phone); // Phone field not in User model
-        currentUser.setDepartment(department);
-        // Extract year number from string like "1st Year", "2nd Year", etc.
-        int yearValue = year.equals("Graduate") ? 5 : Integer.parseInt(year.substring(0, 1));
-        currentUser.setAcademicYear(yearValue);
+        currentUser.setEmail(email);
         
         // Save to database
         try {
