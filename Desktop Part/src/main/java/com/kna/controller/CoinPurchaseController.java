@@ -70,7 +70,7 @@ public class CoinPurchaseController {
      */
     @FXML
     private void selectStarterPackage() {
-        selectPackageDetails("Starter", 50, "$4.99");
+        selectPackageDetails("Starter", 50, "59 BDT");
     }
     
     /**
@@ -78,7 +78,7 @@ public class CoinPurchaseController {
      */
     @FXML
     private void selectValuePackage() {
-        selectPackageDetails("Value Pack", 150, "$9.99");
+        selectPackageDetails("Value Pack", 200, "199 BDT");
     }
     
     /**
@@ -86,7 +86,7 @@ public class CoinPurchaseController {
      */
     @FXML
     private void selectPremiumPackage() {
-        selectPackageDetails("Premium", 400, "$19.99");
+        selectPackageDetails("Premium", 500, "499 BDT");
     }
     
     /**
@@ -94,7 +94,7 @@ public class CoinPurchaseController {
      */
     @FXML
     private void selectUltimatePackage() {
-        selectPackageDetails("Ultimate", 1000, "$39.99");
+        selectPackageDetails("Ultimate", 1000, "899 BDT");
     }
     
     /**
@@ -189,8 +189,8 @@ public class CoinPurchaseController {
 
     private void completePurchase() {
         try {
-            // Process purchase
-            coinService.purchaseCoins(selectedCoins, new BigDecimal(selectedPrice.replace("$", "")));
+            String priceValue = selectedPrice.replace(" BDT", "").replace("৳", "");
+            coinService.purchaseCoins(selectedCoins, new BigDecimal(priceValue));
             
             // Update UI
             currentUser = SessionManager.getInstance().getCurrentUser();
