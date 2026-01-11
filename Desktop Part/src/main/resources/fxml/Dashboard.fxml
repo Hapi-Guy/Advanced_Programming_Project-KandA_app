@@ -14,99 +14,141 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.DashboardController">
-
-    <!-- Top Bar -->
-    <top>
-        <HBox alignment="CENTER_LEFT" prefHeight="60" spacing="20" styleClass="top-bar">
-            <padding>
-                <Insets bottom="10" left="20" right="20" top="10" />
-            </padding>
-
-            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2196F3;" text="KnA" />
-
-            <Region HBox.hgrow="ALWAYS" />
-
-            <!-- Search Bar -->
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #F5F5F5; -fx-background-radius: 20px; -fx-padding: 8px 15px;">
-                <TextField fx:id="searchField" prefWidth="250" promptText="Search questions..." style="-fx-background-color: transparent; -fx-border-width: 0;" />
-                <Button onAction="#handleSearch" style="-fx-background-color: transparent;" text="🔍" />
-            </HBox>
-
-            <!-- Coin Balance -->
-            <HBox alignment="CENTER" spacing="5" styleClass="coin-display">
-                <Label text="💰" />
-                <Label fx:id="coinLabel" text="100" />
-            </HBox>
-
-            <!-- Reputation -->
-            <HBox alignment="CENTER" spacing="5" styleClass="reputation-display">
-                <Label text="⭐" />
-                <Label fx:id="reputationLabel" text="0" />
-            </HBox>
-
-            <!-- Notifications -->
-            <StackPane>
-                <Button onAction="#handleNotifications" style="-fx-background-color: transparent; -fx-font-size: 20px;" text="🔔" />
-                <Label fx:id="notificationBadge" styleClass="notification-badge" visible="false" StackPane.alignment="TOP_RIGHT" />
-            </StackPane>
-
-            <!-- Profile -->
-            <Button fx:id="profileButton" onAction="#handleProfile" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20px; -fx-padding: 8px 15px;" />
-        </HBox>
-    </top>
+<BorderPane stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.DashboardController">
 
     <!-- Left Sidebar Navigation -->
     <left>
-        <VBox prefWidth="220" spacing="5" styleClass="nav-sidebar">
+        <VBox prefWidth="240" spacing="0" style="-fx-background-color: #1E2A38;">
             <padding>
-                <Insets bottom="20" left="0" right="0" top="20" />
+                <Insets bottom="20" left="0" right="0" top="0" />
             </padding>
 
-            <Button alignment="CENTER_LEFT" onAction="#showHome" prefWidth="220" styleClass="nav-item" text="🏠 Home" />
-            <Button alignment="CENTER_LEFT" onAction="#showAskQuestion" prefWidth="220" styleClass="nav-item" text="❓ Ask Question" />
-            <Button alignment="CENTER_LEFT" onAction="#showMyQuestions" prefWidth="220" styleClass="nav-item" text="📝 My Questions" />
-            <Button alignment="CENTER_LEFT" onAction="#showMyAnswers" prefWidth="220" styleClass="nav-item" text="💬 My Answers" />
-            <Button alignment="CENTER_LEFT" onAction="#showLeaderboard" prefWidth="220" styleClass="nav-item" text="🏆 Leaderboard" />
-            <Button alignment="CENTER_LEFT" onAction="#showCoinPurchase" prefWidth="220" styleClass="nav-item" text="🛒 Buy Coins" />
+            <!-- Logo Section -->
+            <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #1A2530; -fx-padding: 20px;">
+                <Label text="🎓" style="-fx-font-size: 28px;"/>
+                <Label text="KnA Platform" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            </HBox>
 
-            <Separator />
+            <VBox spacing="5" style="-fx-padding: 15px 10px;">
+                <Button alignment="CENTER_LEFT" onAction="#showHome" prefWidth="220" text="🏠  Home" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+                <Button alignment="CENTER_LEFT" onAction="#showAskQuestion" prefWidth="220" text="❓  Ask Question" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+                <Button alignment="CENTER_LEFT" onAction="#showMyQuestions" prefWidth="220" text="📝  My Questions" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+                <Button alignment="CENTER_LEFT" onAction="#showMyAnswers" prefWidth="220" text="💬  My Answers" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+                <Button alignment="CENTER_LEFT" onAction="#showLeaderboard" prefWidth="220" text="🏆  Leaderboard" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+                <Button alignment="CENTER_LEFT" onAction="#showCoinPurchase" prefWidth="220" text="🛒  Buy Coins" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+            </VBox>
 
-            <Button fx:id="adminPanelButton" alignment="CENTER_LEFT" onAction="#showAdminPanel" prefWidth="220" styleClass="nav-item" text="⚙️ Admin Panel" visible="false" />
+            <Separator style="-fx-background-color: #37474F;"/>
+
+            <VBox spacing="5" style="-fx-padding: 15px 10px;">
+                <Button fx:id="adminPanelButton" alignment="CENTER_LEFT" onAction="#showAdminPanel" prefWidth="220" text="⚙️  Admin Panel" visible="false" styleClass="nav-item" style="-fx-background-color: transparent; -fx-text-fill: #B0BEC5;"/>
+            </VBox>
 
             <Region VBox.vgrow="ALWAYS" />
 
-            <Button alignment="CENTER_LEFT" onAction="#handleLogout" prefWidth="220" style="-fx-background-color: #D32F2F;" styleClass="nav-item" text="🚪 Logout" />
+            <VBox spacing="5" style="-fx-padding: 15px 10px;">
+                <Button alignment="CENTER_LEFT" onAction="#handleLogout" prefWidth="220" text="🚪  Logout" style="-fx-background-color: #D32F2F; -fx-text-fill: white; -fx-background-radius: 8px; -fx-padding: 12px 20px;"/>
+            </VBox>
         </VBox>
     </left>
 
     <!-- Main Content Area -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #F5F5F5;">
-            <!-- Default: Question Feed -->
-            <ScrollPane fx:id="homeScrollPane" fitToWidth="true" style="-fx-background-color: transparent;">
-                <VBox spacing="20">
-                    <padding>
-                        <Insets bottom="20" left="20" right="20" top="20" />
-                    </padding>
-                    
-                    <!-- Filters -->
-                    <HBox alignment="CENTER_LEFT" spacing="15" styleClass="card">
-                        <Label style="-fx-font-weight: bold;" text="Filters:" />
+        <VBox style="-fx-background-color: #F0F2F5;">
+            <!-- Top Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: white; -fx-padding: 15px 25px; -fx-border-color: #E8E8E8; -fx-border-width: 0 0 1px 0;">
+                
+                <Label text="Dashboard" styleClass="page-title"/>
 
-                        <Label text="Category:" />
-                        <ComboBox fx:id="categoryFilter" onAction="#applyFilters" prefWidth="150" />
+                <Region HBox.hgrow="ALWAYS" />
 
-                        <CheckBox fx:id="urgentOnlyCheckbox" onAction="#applyFilters" text="Urgent Only" />
-                        <CheckBox fx:id="unansweredOnlyCheckbox" onAction="#applyFilters" text="Unanswered Only" />
+                <!-- Search Bar -->
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: #F5F5F5; -fx-background-radius: 25px; -fx-padding: 8px 18px;">
+                    <TextField fx:id="searchField" prefWidth="280" promptText="Search questions..." style="-fx-background-color: transparent; -fx-border-width: 0;" />
+                    <Button onAction="#handleSearch" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🔍" />
+                </HBox>
 
-                        <Region HBox.hgrow="ALWAYS" />
-                    </HBox>
+                <!-- Coin Balance -->
+                <HBox alignment="CENTER" spacing="6" styleClass="coin-display">
+                    <Label text="💰" styleClass="coin-icon-small"/>
+                    <Label fx:id="coinLabel" text="100" styleClass="badge-text"/>
+                </HBox>
 
-                    <!-- Question Feed -->
-                    <VBox fx:id="questionFeedContainer" spacing="15" />
-                </VBox>
-            </ScrollPane>
-        </StackPane>
+                <!-- Reputation -->
+                <HBox alignment="CENTER" spacing="6" styleClass="reputation-display">
+                    <Label text="⭐" style="-fx-font-size: 14px;"/>
+                    <Label fx:id="reputationLabel" text="0" style="-fx-font-weight: bold; -fx-text-fill: #2E7D32;"/>
+                </HBox>
+
+                <!-- Notifications -->
+                <StackPane>
+                    <Button onAction="#handleNotifications" style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-cursor: hand;" text="🔔" />
+                    <Label fx:id="notificationBadge" styleClass="notification-badge" visible="false" StackPane.alignment="TOP_RIGHT" />
+                </StackPane>
+
+                <!-- Profile -->
+                <Button fx:id="profileButton" onAction="#handleProfile" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 20px; -fx-padding: 8px 18px; -fx-font-weight: bold;" />
+            </HBox>
+
+            <!-- Content Area -->
+            <StackPane fx:id="contentArea" VBox.vgrow="ALWAYS" style="-fx-background-color: #F0F2F5;">
+                <!-- Default: Question Feed -->
+                <ScrollPane fx:id="homeScrollPane" fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;">
+                    <VBox spacing="20" style="-fx-background-color: transparent;">
+                        <padding>
+                            <Insets bottom="25" left="25" right="25" top="25" />
+                        </padding>
+                        
+                        <!-- Stats Cards Row -->
+                        <HBox spacing="20">
+                            <VBox alignment="CENTER" spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                <Label text="📋" styleClass="stat-card-icon"/>
+                                <Label text="Total Questions" styleClass="stat-card-label"/>
+                                <Label fx:id="totalQuestionsLabel" text="0" styleClass="stat-card-value"/>
+                            </VBox>
+                            <VBox alignment="CENTER" spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                <Label text="✅" styleClass="stat-card-icon"/>
+                                <Label text="Answered" styleClass="stat-card-label"/>
+                                <Label fx:id="answeredQuestionsLabel" text="0" styleClass="stat-card-value"/>
+                            </VBox>
+                            <VBox alignment="CENTER" spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                <Label text="⏳" styleClass="stat-card-icon"/>
+                                <Label text="Pending" styleClass="stat-card-label"/>
+                                <Label fx:id="pendingQuestionsLabel" text="0" styleClass="stat-card-value"/>
+                            </VBox>
+                            <VBox alignment="CENTER" spacing="8" styleClass="stat-card" HBox.hgrow="ALWAYS">
+                                <Label text="🔥" styleClass="stat-card-icon"/>
+                                <Label text="Urgent" styleClass="stat-card-label"/>
+                                <Label fx:id="urgentQuestionsLabel" text="0" styleClass="stat-card-value"/>
+                            </VBox>
+                        </HBox>
+                        
+                        <!-- Filters Card -->
+                        <VBox spacing="15" styleClass="card">
+                            <HBox alignment="CENTER_LEFT" spacing="20">
+                                <Label text="🔍 Filters" styleClass="section-subtitle"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" spacing="20">
+                                <HBox alignment="CENTER_LEFT" spacing="8">
+                                    <Label text="Category:" styleClass="filter-label"/>
+                                    <ComboBox fx:id="categoryFilter" onAction="#applyFilters" prefWidth="180" styleClass="combo-box"/>
+                                </HBox>
+                                <CheckBox fx:id="urgentOnlyCheckbox" onAction="#applyFilters" text="Urgent Only" styleClass="check-box"/>
+                                <CheckBox fx:id="unansweredOnlyCheckbox" onAction="#applyFilters" text="Unanswered Only" styleClass="check-box"/>
+                            </HBox>
+                        </VBox>
+
+                        <!-- Questions Section Header -->
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="📚 Recent Questions" styleClass="section-title"/>
+                        </HBox>
+
+                        <!-- Question Feed -->
+                        <VBox fx:id="questionFeedContainer" spacing="15" />
+                    </VBox>
+                </ScrollPane>
+            </StackPane>
+        </VBox>
     </center>
 </BorderPane>

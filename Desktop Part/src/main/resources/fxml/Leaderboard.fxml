@@ -1,129 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.kna.controller.LeaderboardController"
-            styleClass="root-pane">
+<VBox spacing="0" stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.LeaderboardController" style="-fx-background-color: #F0F2F5;">
     
-    <!-- Top Bar -->
-    <top>
-        <HBox styleClass="top-bar" alignment="CENTER_LEFT" spacing="15">
+    <!-- Page Header -->
+    <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 20px 25px; -fx-border-color: #E8E8E8; -fx-border-width: 0 0 1px 0;">
+        <Label text="🏆 Leaderboard" styleClass="page-title"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Label text="Top contributors ranked by reputation" styleClass="label-secondary"/>
+    </HBox>
+    
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-background: transparent;">
+        <VBox spacing="25" style="-fx-background-color: transparent;">
             <padding>
-                <Insets top="15" right="20" bottom="15" left="20"/>
+                <Insets bottom="25" left="25" right="25" top="25"/>
             </padding>
             
-
-            <Label text="🏆 Leaderboard" styleClass="page-title"/>
-            <Region HBox.hgrow="ALWAYS"/>
-        </HBox>
-    </top>
-    
-    <!-- Main Content -->
-    <center>
-        <VBox spacing="0" styleClass="content-container">
-            
-            <!-- Tab Bar -->
-            <HBox styleClass="filter-tabs" spacing="15" alignment="CENTER">
-                <padding>
-                    <Insets top="15" right="20" bottom="15" left="20"/>
-                </padding>
+            <!-- Podium Section -->
+            <VBox spacing="20" styleClass="card">
+                <Label text="🥇 Top 3 Champions" styleClass="section-title" style="-fx-padding: 0 0 10px 0;"/>
                 
-                <Button fx:id="allTimeBtn" text="All Time" styleClass="filter-tab,active-tab" onAction="#showAllTime"/>
-                <Button fx:id="monthlyBtn" text="This Month" styleClass="filter-tab" onAction="#showMonthly"/>
-                <Button fx:id="weeklyBtn" text="This Week" styleClass="filter-tab" onAction="#showWeekly"/>
-            </HBox>
-            
-            <!-- Top 3 Podium -->
-            <HBox fx:id="podiumBox" styleClass="podium-container" spacing="20" alignment="CENTER">
-                <padding>
-                    <Insets top="30" right="40" bottom="30" left="40"/>
-                </padding>
-                
-                <!-- 2nd Place -->
-                <VBox fx:id="secondPlace" spacing="10" alignment="CENTER" styleClass="podium-card,second-place">
-                    <padding>
-                        <Insets top="20" right="15" bottom="20" left="15"/>
-                    </padding>
-                    <Label text="🥈" style="-fx-font-size: 36px;"/>
-                    <StackPane styleClass="avatar-medium">
-                        <Label fx:id="secondAvatar" styleClass="avatar-text-medium"/>
-                    </StackPane>
-                    <Label fx:id="secondName" styleClass="podium-name"/>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Label text="⭐" styleClass="podium-icon"/>
-                        <Label fx:id="secondScore" styleClass="podium-score"/>
-                    </HBox>
-                </VBox>
-                
-                <!-- 1st Place (taller) -->
-                <VBox fx:id="firstPlace" spacing="10" alignment="CENTER" styleClass="podium-card,first-place">
-                    <padding>
-                        <Insets top="25" right="20" bottom="25" left="20"/>
-                    </padding>
-                    <Label text="🥇" style="-fx-font-size: 48px;"/>
-                    <StackPane styleClass="avatar-large">
-                        <Label fx:id="firstAvatar" styleClass="avatar-text-large"/>
-                    </StackPane>
-                    <Label fx:id="firstName" styleClass="podium-name"/>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Label text="⭐" styleClass="podium-icon"/>
-                        <Label fx:id="firstScore" styleClass="podium-score"/>
-                    </HBox>
-                </VBox>
-                
-                <!-- 3rd Place -->
-                <VBox fx:id="thirdPlace" spacing="10" alignment="CENTER" styleClass="podium-card,third-place">
-                    <padding>
-                        <Insets top="20" right="15" bottom="20" left="15"/>
-                    </padding>
-                    <Label text="🥉" style="-fx-font-size: 36px;"/>
-                    <StackPane styleClass="avatar-medium">
-                        <Label fx:id="thirdAvatar" styleClass="avatar-text-medium"/>
-                    </StackPane>
-                    <Label fx:id="thirdName" styleClass="podium-name"/>
-                    <HBox spacing="5" alignment="CENTER">
-                        <Label text="⭐" styleClass="podium-icon"/>
-                        <Label fx:id="thirdScore" styleClass="podium-score"/>
-                    </HBox>
-                </VBox>
-            </HBox>
-            
-            <Separator/>
-            
-            <!-- Rankings List -->
-            <VBox spacing="0" VBox.vgrow="ALWAYS">
-                <Label text="Top Rankings" styleClass="section-header">
-                    <padding>
-                        <Insets top="15" right="20" bottom="10" left="20"/>
-                    </padding>
-                </Label>
-                
-                <ScrollPane fx:id="leaderboardScrollPane" fitToWidth="true" styleClass="scroll-pane" VBox.vgrow="ALWAYS">
-                    <VBox fx:id="leaderboardList" spacing="5" styleClass="leaderboard-list">
-                        <padding>
-                            <Insets top="5" right="20" bottom="20" left="20"/>
-                        </padding>
+                <HBox alignment="BOTTOM_CENTER" spacing="30" style="-fx-padding: 20px 0;">
+                    <!-- 2nd Place -->
+                    <VBox fx:id="secondPlaceCard" alignment="CENTER" spacing="10" styleClass="podium-card, second-place" style="-fx-padding: 20px;">
+                        <Label text="🥈" style="-fx-font-size: 36px;"/>
+                        <VBox alignment="CENTER" styleClass="avatar-medium">
+                            <Label fx:id="secondPlaceAvatar" text="?" styleClass="avatar-text-medium"/>
+                        </VBox>
+                        <Label fx:id="secondPlaceName" text="-" styleClass="podium-name"/>
+                        <Label fx:id="secondPlaceScore" text="0" styleClass="podium-score"/>
+                        <Label text="reputation" styleClass="label-secondary"/>
                     </VBox>
-                </ScrollPane>
+                    
+                    <!-- 1st Place -->
+                    <VBox fx:id="firstPlaceCard" alignment="CENTER" spacing="10" styleClass="podium-card, first-place" style="-fx-padding: 25px;">
+                        <Label text="🥇" style="-fx-font-size: 42px;"/>
+                        <VBox alignment="CENTER" styleClass="avatar-large">
+                            <Label fx:id="firstPlaceAvatar" text="?" styleClass="avatar-text-large"/>
+                        </VBox>
+                        <Label fx:id="firstPlaceName" text="-" styleClass="podium-name" style="-fx-font-size: 16px;"/>
+                        <Label fx:id="firstPlaceScore" text="0" styleClass="podium-score" style="-fx-font-size: 20px;"/>
+                        <Label text="reputation" styleClass="label-secondary"/>
+                    </VBox>
+                    
+                    <!-- 3rd Place -->
+                    <VBox fx:id="thirdPlaceCard" alignment="CENTER" spacing="10" styleClass="podium-card, third-place" style="-fx-padding: 20px;">
+                        <Label text="🥉" style="-fx-font-size: 32px;"/>
+                        <VBox alignment="CENTER" styleClass="avatar-medium">
+                            <Label fx:id="thirdPlaceAvatar" text="?" styleClass="avatar-text-medium"/>
+                        </VBox>
+                        <Label fx:id="thirdPlaceName" text="-" styleClass="podium-name"/>
+                        <Label fx:id="thirdPlaceScore" text="0" styleClass="podium-score"/>
+                        <Label text="reputation" styleClass="label-secondary"/>
+                    </VBox>
+                </HBox>
             </VBox>
             
-            <!-- Empty State -->
-            <StackPane fx:id="emptyStatePane" managed="false" visible="false">
-                <padding>
-                    <Insets top="50"/>
-                </padding>
-                <VBox spacing="15" alignment="CENTER">
-                    <Label text="📊" style="-fx-font-size: 48px;"/>
-                    <Label text="No rankings available" styleClass="empty-state-text"/>
-                    <Label text="Be the first to earn reputation points!" 
-                           styleClass="empty-state-subtext"/>
-                </VBox>
-            </StackPane>
+            <!-- Rankings List Header -->
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="📊 Complete Rankings" styleClass="section-title"/>
+            </HBox>
+            
+            <!-- Rankings List -->
+            <VBox fx:id="leaderboardList" spacing="10" styleClass="leaderboard-list"/>
             
         </VBox>
-    </center>
-    
-</BorderPane>
+    </ScrollPane>
+</VBox>
