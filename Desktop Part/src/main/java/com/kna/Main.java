@@ -74,23 +74,26 @@ public class Main extends Application {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Main.class.getResource("/css/application.css").toExternalForm());
             
+            // Temporarily disable maximized/fullscreen to set scene properly
+            if (wasMaximized || wasFullScreen) {
+                primaryStage.setMaximized(false);
+                primaryStage.setFullScreen(false);
+            }
+            
             primaryStage.setScene(scene);
             primaryStage.setTitle(title);
             
-            // Restore window state AFTER scene is set
-            if (!wasFullScreen && !wasMaximized) {
+            // Immediately restore window state
+            if (wasMaximized) {
+                javafx.application.Platform.runLater(() -> primaryStage.setMaximized(true));
+            } else if (wasFullScreen) {
+                javafx.application.Platform.runLater(() -> primaryStage.setFullScreen(true));
+            } else {
+                // Only restore dimensions if not maximized or fullscreen
                 primaryStage.setWidth(currentWidth);
                 primaryStage.setHeight(currentHeight);
                 primaryStage.setX(currentX);
                 primaryStage.setY(currentY);
-            }
-            
-            if (wasMaximized) {
-                primaryStage.setMaximized(true);
-            }
-            
-            if (wasFullScreen) {
-                primaryStage.setFullScreen(true);
             }
         } catch (Exception e) {
             e.printStackTrace();

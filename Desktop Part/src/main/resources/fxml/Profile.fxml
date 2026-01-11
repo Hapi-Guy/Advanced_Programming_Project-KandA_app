@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
@@ -10,118 +9,118 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.ProfileController" style="-fx-background-color: #F0F2F5; -fx-background: #F0F2F5;">
+<ScrollPane fitToWidth="true" style="-fx-background-color: #F0F2F5; -fx-background: #F0F2F5;" stylesheets="@../css/application.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kna.controller.ProfileController">
     <VBox spacing="0" style="-fx-background-color: #F0F2F5;">
         
         <!-- Page Header -->
         <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 20px 25px; -fx-border-color: #E8E8E8; -fx-border-width: 0 0 1px 0;">
-            <Button text="←" onAction="#goBack" styleClass="secondary-button" style="-fx-font-size: 16px;"/>
-            <Label text="👤 My Profile" styleClass="page-title"/>
-            <Region HBox.hgrow="ALWAYS"/>
+            <Button onAction="#goBack" style="-fx-font-size: 16px;" styleClass="secondary-button" text="←" />
+            <Label styleClass="page-title" text="👤 My Profile" />
+            <Region HBox.hgrow="ALWAYS" />
         </HBox>
         
         <VBox spacing="25" style="-fx-padding: 25px;">
             
             <!-- Profile Header Card -->
-            <HBox spacing="25" styleClass="card" alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_LEFT" spacing="25" styleClass="card">
                 <!-- Avatar -->
                 <VBox alignment="CENTER" styleClass="profile-avatar">
-                    <Label fx:id="avatarLabel" text="?" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
+                    <Label fx:id="avatarLabel" style="-fx-font-size: 42px; -fx-font-weight: bold; -fx-text-fill: #2196F3;" text="?" />
                 </VBox>
                 
                 <!-- User Info -->
                 <VBox spacing="8" HBox.hgrow="ALWAYS">
-                    <Label fx:id="usernameDisplayLabel" text="Username" styleClass="profile-name"/>
-                    <Label fx:id="emailDisplayLabel" text="email@example.com" styleClass="profile-email"/>
+                    <Label fx:id="usernameDisplayLabel" styleClass="profile-name" text="Username" />
+                    <Label fx:id="emailDisplayLabel" styleClass="profile-email" text="email@example.com" />
                     <HBox spacing="5">
-                        <Label fx:id="roleBadge" text="USER" styleClass="badge"/>
+                        <Label fx:id="roleBadge" styleClass="badge" text="USER" />
                     </HBox>
                 </VBox>
                 
                 <!-- Stats -->
                 <HBox spacing="30">
                     <VBox alignment="CENTER" spacing="4">
-                        <Label text="💰" style="-fx-font-size: 24px;"/>
-                        <Label fx:id="coinBalanceLabel" text="0" styleClass="stat-card-value"/>
-                        <Label text="Coins" styleClass="stat-label"/>
+                        <Label style="-fx-font-size: 24px;" text="💰" />
+                        <Label fx:id="coinBalanceLabel" styleClass="stat-card-value" text="0" />
+                        <Label styleClass="stat-label" text="Coins" />
                     </VBox>
                     <VBox alignment="CENTER" spacing="4">
-                        <Label text="⭐" style="-fx-font-size: 24px;"/>
-                        <Label fx:id="reputationLabel" text="0" styleClass="stat-card-value"/>
-                        <Label text="Reputation" styleClass="stat-label"/>
+                        <Label style="-fx-font-size: 24px;" text="⭐" />
+                        <Label fx:id="reputationLabel" styleClass="stat-card-value" text="0" />
+                        <Label styleClass="stat-label" text="Reputation" />
                     </VBox>
                 </HBox>
             </HBox>
             
             <!-- Activity Stats -->
             <VBox spacing="15" styleClass="card">
-                <Label text="📊 Activity Statistics" styleClass="section-subtitle"/>
+                <Label styleClass="section-subtitle" text="📊 Activity Statistics" />
                 <HBox spacing="40">
                     <VBox spacing="4">
-                        <Label text="Questions Asked" styleClass="stat-label"/>
-                        <Label fx:id="questionsAskedLabel" text="0" styleClass="stat-value-large"/>
+                        <Label styleClass="stat-label" text="Questions Asked" />
+                        <Label fx:id="questionsAskedLabel" styleClass="stat-value-large" text="0" />
                     </VBox>
                     <VBox spacing="4">
-                        <Label text="Answers Given" styleClass="stat-label"/>
-                        <Label fx:id="answersGivenLabel" text="0" styleClass="stat-value-large"/>
+                        <Label styleClass="stat-label" text="Answers Given" />
+                        <Label fx:id="answersGivenLabel" styleClass="stat-value-large" text="0" />
                     </VBox>
                     <VBox spacing="4">
-                        <Label text="Accepted Answers" styleClass="stat-label"/>
-                        <Label fx:id="acceptedAnswersLabel" text="0" styleClass="stat-value-large" style="-fx-text-fill: #4CAF50;"/>
+                        <Label styleClass="stat-label" text="Accepted Answers" />
+                        <Label fx:id="acceptedAnswersLabel" style="-fx-text-fill: #4CAF50;" styleClass="stat-value-large" text="0" />
                     </VBox>
                     <VBox spacing="4">
-                        <Label text="Member Since" styleClass="stat-label"/>
-                        <Label fx:id="memberSinceLabel" text="-" styleClass="stat-value-large" style="-fx-font-size: 16px;"/>
+                        <Label styleClass="stat-label" text="Member Since" />
+                        <Label fx:id="memberSinceLabel" style="-fx-font-size: 16px;" styleClass="stat-value-large" text="-" />
                     </VBox>
                 </HBox>
             </VBox>
             
             <!-- Edit Profile Section -->
             <VBox spacing="20" styleClass="card">
-                <Label text="✏️ Edit Profile" styleClass="section-subtitle"/>
+                <Label styleClass="section-subtitle" text=" 🖍 Edit Profile" />
                 
                 <HBox spacing="30">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="Username" styleClass="input-label"/>
-                        <TextField fx:id="usernameField" promptText="Username" styleClass="input-field"/>
+                        <Label styleClass="input-label" text="Username" />
+                        <TextField fx:id="usernameField" promptText="Username" styleClass="input-field" />
                     </VBox>
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="Email" styleClass="input-label"/>
-                        <TextField fx:id="emailField" promptText="Email" styleClass="input-field"/>
+                        <Label styleClass="input-label" text="Email" />
+                        <TextField fx:id="emailField" promptText="Email" styleClass="input-field" />
                     </VBox>
                 </HBox>
                 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button text="Update Profile" onAction="#updateProfile" styleClass="primary-button"/>
+                    <Button onAction="#updateProfile" styleClass="primary-button" text="Update Profile" />
                 </HBox>
             </VBox>
             
             <!-- Change Password Section -->
             <VBox spacing="20" styleClass="card">
-                <Label text="🔐 Change Password" styleClass="section-subtitle"/>
+                <Label styleClass="section-subtitle" text="🔐 Change Password" />
                 
                 <HBox spacing="30">
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="Current Password" styleClass="input-label"/>
-                        <PasswordField fx:id="currentPasswordField" promptText="Enter current password" styleClass="input-field"/>
+                        <Label styleClass="input-label" text="Current Password" />
+                        <PasswordField fx:id="currentPasswordField" promptText="Enter current password" styleClass="input-field" />
                     </VBox>
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="New Password" styleClass="input-label"/>
-                        <PasswordField fx:id="newPasswordField" promptText="Enter new password" styleClass="input-field"/>
+                        <Label styleClass="input-label" text="New Password" />
+                        <PasswordField fx:id="newPasswordField" promptText="Enter new password" styleClass="input-field" />
                     </VBox>
                     <VBox spacing="8" HBox.hgrow="ALWAYS">
-                        <Label text="Confirm New Password" styleClass="input-label"/>
-                        <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" styleClass="input-field"/>
+                        <Label styleClass="input-label" text="Confirm New Password" />
+                        <PasswordField fx:id="confirmPasswordField" promptText="Confirm new password" styleClass="input-field" />
                     </VBox>
                 </HBox>
                 
                 <HBox alignment="CENTER_RIGHT">
-                    <Button text="Change Password" onAction="#changePassword" styleClass="warning-button"/>
+                    <Button onAction="#changePassword" styleClass="warning-button" text="Change Password" />
                 </HBox>
             </VBox>
             
             <!-- Status Messages -->
-            <Label fx:id="statusLabel" wrapText="true"/>
+            <Label fx:id="statusLabel" wrapText="true" />
             
         </VBox>
     </VBox>
