@@ -23,6 +23,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -41,10 +42,8 @@ public class MyAnswersController {
     @FXML private Label pendingAnswersLabel;
     @FXML private Label totalCoinsEarnedLabel;
     
-    // Filter Buttons
-    @FXML private Button allFilterBtn;
-    @FXML private Button acceptedFilterBtn;
-    @FXML private Button pendingFilterBtn;
+    // Filter ComboBox
+    @FXML private ComboBox<String> filterComboBox;
     
     // Content Areas
     @FXML private VBox answersContainer;
@@ -66,9 +65,10 @@ public class MyAnswersController {
         answerService = new AnswerService();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
-        // Set initial active filter tab
-        if (allFilterBtn != null) {
-            allFilterBtn.getStyleClass().add("active");
+        // Initialize filter dropdown
+        if (filterComboBox != null) {
+            filterComboBox.getItems().addAll("All", "Accepted", "Pending");
+            filterComboBox.setValue("All");
         }
         
         if (currentUser != null) {
@@ -78,6 +78,23 @@ public class MyAnswersController {
             showError("Session expired. Please login again.");
             goToLogin();
         }
+    }
+    
+    /**
+     * Handle filter selection change from dropdown.
+     */
+    @FXML
+    private void onFilterChanged() {
+        if (filterComboBox == null || filterComboBox.getValue() == null) return;
+        
+        String selected = filterComboBox.getValue();
+        currentFilter = switch (selected) {
+            case "Accepted" -> "accepted";
+            case "Pending" -> "pending";
+            default -> "all";
+        };
+        
+        displayAnswers(allAnswers);
     }
     
     /**
@@ -331,46 +348,6 @@ public class MyAnswersController {
             // Ignore and return null
         }
         return null;
-    }
-    
-    /**
-     * Filter: Show all answers.
-     */
-    @FXML
-    private void filterAll() {
-        currentFilter = "all";
-        updateActiveFilter(allFilterBtn);
-        displayAnswers(allAnswers);
-    }
-    
-    /**
-     * Filter: Show accepted answers.
-     */
-    @FXML
-    private void filterAccepted() {
-        currentFilter = "accepted";
-        updateActiveFilter(acceptedFilterBtn);
-        displayAnswers(allAnswers);
-    }
-    
-    /**
-     * Filter: Show pending answers.
-     */
-    @FXML
-    private void filterPending() {
-        currentFilter = "pending";
-        updateActiveFilter(pendingFilterBtn);
-        displayAnswers(allAnswers);
-    }
-    
-    /**
-     * Update active filter button styling.
-     */
-    private void updateActiveFilter(Button activeButton) {
-        if (allFilterBtn != null) allFilterBtn.getStyleClass().remove("active");
-        if (acceptedFilterBtn != null) acceptedFilterBtn.getStyleClass().remove("active");
-        if (pendingFilterBtn != null) pendingFilterBtn.getStyleClass().remove("active");
-        if (activeButton != null) activeButton.getStyleClass().add("active");
     }
     
     /**

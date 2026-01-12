@@ -6,6 +6,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -34,6 +35,14 @@ public class Main extends Application {
             stage.setScene(scene);
             stage.setMinWidth(1000);
             stage.setMinHeight(700);
+            
+            // Set application icon
+            try {
+                stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/icon.png")));
+            } catch (Exception iconError) {
+                System.err.println("Could not load application icon: " + iconError.getMessage());
+            }
+            
             stage.show();
             
         } catch (Exception e) {

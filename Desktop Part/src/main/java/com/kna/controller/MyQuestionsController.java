@@ -21,6 +21,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -39,11 +40,8 @@ public class MyQuestionsController {
     @FXML private Label pendingQuestionsLabel;
     @FXML private Label totalCoinsSpentLabel;
     
-    // Filter Buttons
-    @FXML private Button allFilterBtn;
-    @FXML private Button answeredFilterBtn;
-    @FXML private Button pendingFilterBtn;
-    @FXML private Button urgentFilterBtn;
+    // Filter ComboBox
+    @FXML private ComboBox<String> filterComboBox;
     
     // Content Areas
     @FXML private VBox questionsContainer;
@@ -63,9 +61,10 @@ public class MyQuestionsController {
         questionService = new QuestionService();
         currentUser = SessionManager.getInstance().getCurrentUser();
         
-        // Set initial active filter tab
-        if (allFilterBtn != null) {
-            allFilterBtn.getStyleClass().add("active");
+        // Initialize filter dropdown
+        if (filterComboBox != null) {
+            filterComboBox.getItems().addAll("All", "Answered", "Pending", "Urgent");
+            filterComboBox.setValue("All");
         }
         
         if (currentUser != null) {
@@ -75,6 +74,24 @@ public class MyQuestionsController {
             showError("Session expired. Please login again.");
             goToLogin();
         }
+    }
+    
+    /**
+     * Handle filter selection change from dropdown.
+     */
+    @FXML
+    private void onFilterChanged() {
+        if (filterComboBox == null || filterComboBox.getValue() == null) return;
+        
+        String selected = filterComboBox.getValue();
+        currentFilter = switch (selected) {
+            case "Answered" -> "answered";
+            case "Pending" -> "pending";
+            case "Urgent" -> "urgent";
+            default -> "all";
+        };
+        
+        displayQuestions(allQuestions);
     }
     
     /**
@@ -311,57 +328,6 @@ public class MyQuestionsController {
             // Ignore and return null
         }
         return null;
-    }
-    
-    /**
-     * Filter: Show all questions.
-     */
-    @FXML
-    private void filterAll() {
-        currentFilter = "all";
-        updateActiveFilter(allFilterBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Filter: Show answered questions.
-     */
-    @FXML
-    private void filterAnswered() {
-        currentFilter = "answered";
-        updateActiveFilter(answeredFilterBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Filter: Show pending questions.
-     */
-    @FXML
-    private void filterPending() {
-        currentFilter = "pending";
-        updateActiveFilter(pendingFilterBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Filter: Show urgent questions.
-     */
-    @FXML
-    private void filterUrgent() {
-        currentFilter = "urgent";
-        updateActiveFilter(urgentFilterBtn);
-        displayQuestions(allQuestions);
-    }
-    
-    /**
-     * Update active filter button styling.
-     */
-    private void updateActiveFilter(Button activeButton) {
-        if (allFilterBtn != null) allFilterBtn.getStyleClass().remove("active");
-        if (answeredFilterBtn != null) answeredFilterBtn.getStyleClass().remove("active");
-        if (pendingFilterBtn != null) pendingFilterBtn.getStyleClass().remove("active");
-        if (urgentFilterBtn != null) urgentFilterBtn.getStyleClass().remove("active");
-        if (activeButton != null) activeButton.getStyleClass().add("active");
     }
     
     /**
